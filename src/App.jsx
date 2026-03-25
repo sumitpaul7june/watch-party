@@ -1,10 +1,26 @@
+import CreateRoom from "./components/CreateRoom";
+import { createBrowserRouter, RouterProvider } from "react-router";
+import HomePage from "./components/HomePage";
+import ErrorPage from "./components/ErrorPage";
 function App()
 {
+  const router = createBrowserRouter([
+    {
+      path: '/',
+      element: <CreateRoom/>
+    },
+    {
+      path: '/home',
+      element: <HomePage/>
+    },
+    {
+      path: '*',
+      element: <ErrorPage/>
+    }
+  ])
+    
   return(
-    <div>
-      <h1>Watch Party</h1>
-      <p>Work in progress</p>
-    </div>
+    <RouterProvider router={router}/>
   );
 }
 
