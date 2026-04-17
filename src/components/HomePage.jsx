@@ -1,26 +1,68 @@
-import { useState } from "react";
+import React from 'react'
+import { useState, useRef } from 'react'
+import YouTube from 'react-youtube'
 
-function HomePage()
-{
-    const [inputValue, setInputValue] = useState('');
+const HomePage = () => {
+
     
-    const handleChange = (e) => {
+    const [inputValue, setInputValue] = useState('');
+    const playerRef = useRef(null);
+
+    
+
+    // Extract Video ID from youtube video url
+    const videoId = inputValue && inputValue.includes("v=") ? inputValue.split("v=")[1].split("&")[0] : '';
+    const opts = {
+        height: '500',
+        width: '800',
+        playerVars: {
+            controls: 1,
+            rel: 0,
+            modestbranding: 1,
+        }
+    }
+
+    const onPlayerReady = (e) => {
+        playerRef.current = e.target;
+        console.log('Remote control connected');
+        
+    }
+    const handleInputChange = (e) => {
         setInputValue(e.target.value);
     }
-    // Extract video ID from youtube url
-    const videoId = inputValue.split("v=")[1];
-    
-    return(
+
+    const handleStateChange = (e) => {
+        const stateCode = e.data;
+        const state = e.target;
+        const currentTime = state.getCurrentTime();
+        
+       console.log(currentTime);
+       
+        if(stateCode == 1) console.log('User hit play at:', currentTime);
+        if(stateCode == 2) console.log('User hit pause at:', currentTime);
+        if(stateCode == 3) console.log('User scrubbed to:', currentTime);
+        
+        
+    }
+
+
+  return (
+    <div>
+        <input type="text" placeholder="Enter the youtube link" value = {inputValue} onChange={handleInputChange}/>
+
         <div>
-            <input type="text" placeholder="Paste the url link" value={inputValue} onChange={handleChange}/>
-            <div>
-                <iframe src= {`https://www.youtube.com/embed/${videoId}`} height="500px" width="800px" allowFullScreen
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture"
-                ></iframe>
-            </div>
+        {videoId &&  <YouTube videoId={videoId} opts={opts} onStateChange={handleStateChange} onReady={onPlayerReady} />}
         </div>
-    );
-} 
 
-export default HomePage;
+        <div>
+            <button onClick={() => playerRef.current.playVideo()}>Force Play</button>
+            <button onClick={() => playerRef.current.pauseVideo()}>Force Pause</button>
+            <button onClick={() => playerRef.current.seekTo(60)}>Force Skip 1min</button>
+        </div>
+       
 
+    </div>
+  )
+}
+
+export default HomePage
