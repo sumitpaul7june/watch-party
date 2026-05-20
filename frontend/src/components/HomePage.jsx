@@ -69,42 +69,56 @@ const HomePage = () => {
         }   
     }
 
-    // 📡 THE RECEIVER
-    useEffect(() => {
-        // Listen for incoming sync commands from other users via the backend
-        socket.on('video-command', (data) => {
-            if(!playerRef.current) return;
-            
-            // Ask YouTube what it is currently doing before acting
-            const currentState = playerRef.current.getPlayerState();
-
-            // 1. Handle incoming PAUSE command
-            if(data.stateCode === 2) {
-                // Fixes the "Stuck Shield" trap: Only force pause if we aren't already paused
-                if(currentState !== 2) {
-                    console.log('Received PAUSE. Raising shield.');
-                    isReceivingSyncRef.current = true;
-                    playerRef.current.pauseVideo();
-                }
-            }
-            
-            // 2. Handle incoming PLAY command
-            if(data.stateCode === 1) {
-                // Fixes the "Stuck Shield" trap: Only force play if we aren't already playing
-                if(currentState !== 1) {
-                    console.log('Received PLAY. Raising shield.');
-                    isReceivingSyncRef.current = true;
-                    playerRef.current.playVideo();
-                }
-            }
-        });
-
-        // Cleanup function: Removes the listener when the component unmounts.
-        // Prevents memory leaks and stacking duplicate listeners if the component re-renders.
-        return () => {
-            socket.off('video-command');
+   // THE RECEIVER
+   useEffect(() => {
+    socket.on('video-command', (data) => {
+        if(!playerRef.current) return;
+        
+        const currentState = playerRef.current.getPlayerState();
+        const myCurrentTime = playerRef.current.getCurrentTime();
+        
+        // 1. SYNC THE TIME FIRST
+        // Fix the location before we touch the play/pause buttons
+        const timeDifferences = Math.abs(myCurrentTime - data.currentTime);
+        if(timeDifferences > 2) {
+            console.log(`Large time gap detected. Forcing sync to ${data.currentTime}`);
+            isReceivingSyncRef.current = true;
+            playerRef.current.seekTo(data.currentTime);
         }
-    }, []);
+
+        // 2. THE "WAIT FOR ME" PROTOCOL (Red Light)
+        // If they are buffering, we must pause and wait.
+        if(data.stateCode === 3) {
+            if(currentState !== 2) { // Protect against the stuck shield!
+                console.log('Other user is buffering. Pausing to wait.');
+                isReceivingSyncRef.current = true;
+                playerRef.current.pauseVideo();
+            }
+        }
+
+        // 3. HANDLE PLAY (Green Light)
+        if(data.stateCode === 1) {
+            if(currentState !== 1) {
+                console.log('Received PLAY. Raising shield.');
+                isReceivingSyncRef.current = true;
+                playerRef.current.playVideo();
+            }
+        }
+
+        // 4. HANDLE PAUSE
+        if(data.stateCode === 2) {
+            if(currentState !== 2) {
+                console.log('Received PAUSE. Raising shield.');
+                isReceivingSyncRef.current = true;
+                playerRef.current.pauseVideo();
+            }
+        }
+    });
+
+    return () => {
+        socket.off('video-command');
+    }
+}, []);
 
     return (
         <div>

@@ -4,6 +4,7 @@ import http from 'http';
 import path from 'path';
 import { Server } from 'socket.io';
 import { log } from 'console';
+import isValidVideoCommand from './utils/videoValidators.js';
 
 const app = express();
 
@@ -34,6 +35,8 @@ io.on('connection', (socket) => {
     socket.on('video-command', (data) => {
         console.log(`Command recieved from ${socket.id}: `, data);
 
+        // Validate the payload before broadcasting it to other end user.
+        if (!isValidVideoCommand(data)) return;
 
         // Broadcast this exact command to everyone else
         socket.broadcast.emit('video-command', data);
