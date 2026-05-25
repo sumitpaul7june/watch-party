@@ -10,7 +10,7 @@ function App()
       element: <CreateRoom/>
     },
     {
-      path: '/home',
+      path: '/home/:roomId',
       element: <HomePage/>
     },
     {
