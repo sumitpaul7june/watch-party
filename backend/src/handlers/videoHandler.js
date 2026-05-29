@@ -1,7 +1,7 @@
 import isValidVideoCommand from '../utils/videoValidators.js';
 
 
-export default (io, socket) => {
+export default (socket) => {
     // Listen for video commands from this user
     socket.on('video-command', (data) => {
         console.log(`Command received from ${socket.id}: `, data);

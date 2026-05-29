@@ -1,6 +1,5 @@
 import { Server } from "socket.io";
-import registerVideoHandlers from './src/handlers/videoHandler.js';
-
+import roomHandler from "./src/handlers/roomHandler.js";
 export function initSocket(server) {
 
     // It hooks the socketio into the server and configured to allow cors requests and it's methods.
@@ -15,7 +14,7 @@ export function initSocket(server) {
         console.log(`User is connected: ${socket.id}`);
 
         // Handle video-command from users
-        registerVideoHandlers(io, socket);
+        roomHandler(socket);
 
         // When the user gets disconnected
         socket.on('disconnect', () => {

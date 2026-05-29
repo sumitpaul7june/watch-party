@@ -1,4 +1,4 @@
-export const extractYoutubeVideoId = (url) => {
+export const extractYouTubeVideoId = (url) => {
     if (!url || !url.includes("v=")) return '';
 
     // Extracts the ID from standard youtube.com/watch?v=XXXXX links

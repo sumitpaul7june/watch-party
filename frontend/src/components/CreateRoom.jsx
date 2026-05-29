@@ -5,8 +5,6 @@ import {useNavigate } from "react-router";
 function CreateRoom()
 {
     
-    
-    
     const navigate = useNavigate();
     const [roomId, setRoomId] = useState('');
 

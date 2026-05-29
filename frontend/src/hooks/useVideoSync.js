@@ -1,8 +1,9 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, use } from 'react';
 
 export const useVideoSync = (socket) => {
     const playerRef = useRef(null);
     const isReceivingSyncRef = useRef(false);
+
 
     // THE RECEIVER (Listens to the backend)
     useEffect(() => {
@@ -60,10 +61,12 @@ export const useVideoSync = (socket) => {
         const stateCode = e.data;
         const currentTime = e.target.getCurrentTime();
 
-        if (stateCode === 1 || stateCode === 2 || stateCode === 3) {
+
+        if ([1, 2, 3].includes(stateCode)) {
             console.log("Human interaction detected. Sending command...");
             socket.emit('video-command', { stateCode, currentTime });
         }
+
     };
 
     const onPlayerReady = (e) => {
