@@ -5,6 +5,7 @@ import { extractYouTubeVideoId } from '../utils/videoUtils.js';
 import { useVideoSync } from '../hooks/useVideoSync';
 import { useParams } from 'react-router';
 import { useRoomManagement } from '../hooks/useRoomManagement.js';
+import VideoPlayer from './VideoPlayer.jsx';
 
 const socket = io("http://localhost:8080");
 
@@ -12,8 +13,6 @@ const HomePage = () => {
 
     const [inputValue, setInputValue] = useState('');
    
-   
-
     // Fetch room from the url params
     const {roomId} = useParams();
     console.log('fetched ', roomId);
@@ -25,19 +24,6 @@ const HomePage = () => {
     // Fetch video Id from the
     const videoId = extractYouTubeVideoId(inputValue);
 
-    const { onPlayerReady, handleStateChange } = useVideoSync(socket);
-
-    
-    const opts = {
-        height: '500',
-        width: '800',
-        playerVars: {
-            controls: 1,
-            rel: 0,
-            modestbranding: 1,
-        }
-    };
-
     return (
         <div>
             <input 
@@ -48,14 +34,11 @@ const HomePage = () => {
             />
 
             <div>
-                {videoId && (
-                    <YouTube 
-                        videoId={videoId} 
-                        opts={opts} 
-                        onStateChange={handleStateChange} 
-                        onReady={onPlayerReady} 
-                    />
-                )}
+                <VideoPlayer
+                socket={socket}
+                roomId={roomId}
+                videoId={videoId}
+                />
             </div>
         </div>
     );

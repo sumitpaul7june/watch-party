@@ -5,6 +5,7 @@ export const useVideoSync = (socket) => {
     const isReceivingSyncRef = useRef(false);
 
 
+
     // THE RECEIVER (Listens to the backend)
     useEffect(() => {
         const handleVideoCommand = (data) => {
