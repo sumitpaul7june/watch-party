@@ -1,4 +1,4 @@
-import { useVideoSync } from "../hooks/useVideoSync";
+import { useVideoSync } from "../hooks/useVideoSync.js";
 const VideoPlayer = ({socket, roomId, videoId}) => {
 
     const {onPlayerReady, handleStateChange } = useVideoSync(socket);
