@@ -50,6 +50,12 @@ class RoomStore {
         return rooms.get(roomId);
     }
 
+    // Check if the room has reached max capacity
+    isRoomFull(roomId) {
+        const size = this.getRoom(roomId)?.users.size || 0;
+        return size >= 2;
+    }
+
     // Clean up a user from all rooms when they disconnect
     removeUserFromAllRooms(userId) {
         for (const [roomId, room] of rooms.entries()) {

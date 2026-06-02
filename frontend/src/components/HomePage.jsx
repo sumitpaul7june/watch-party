@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { io } from 'socket.io-client';import { useParams } from 'react-router';
+import { useParams } from 'react-router';
 import { useRoomManagement } from '../hooks/useRoomManagement.js';
 import VideoPlayer from './VideoPlayer.jsx';
-
-const socket = io("http://localhost:8080");
+import { socket } from '../socket.js';
 
 const HomePage = () => {
 
