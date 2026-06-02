@@ -1,9 +1,5 @@
 import React, { useState } from 'react';
-import YouTube from 'react-youtube';
-import { io } from 'socket.io-client';
-import { extractYouTubeVideoId } from '../utils/videoUtils.js';
-import { useVideoSync } from '../hooks/useVideoSync';
-import { useParams } from 'react-router';
+import { io } from 'socket.io-client';import { useParams } from 'react-router';
 import { useRoomManagement } from '../hooks/useRoomManagement.js';
 import VideoPlayer from './VideoPlayer.jsx';
 
@@ -12,6 +8,8 @@ const socket = io("http://localhost:8080");
 const HomePage = () => {
 
     const [inputValue, setInputValue] = useState('');
+    const [videoId, setVideoId] = useState('');
+
    
     // Fetch room from the url params
     const {roomId} = useParams();
@@ -22,7 +20,28 @@ const HomePage = () => {
     useRoomManagement(roomId, socket);
 
     // Fetch video Id from the
-    const videoId = extractYouTubeVideoId(inputValue);
+    const handleInputChange = (e) => {
+        const url = e.target.value;
+        setInputValue(url);
+
+        let extracted = '';
+        if (url.includes("v=")) 
+        {
+            // Standard youtube.com/watch?v=XXXXX
+            extracted = url.split("v=")[1].split("&")[0];
+        }
+        else if (url.includes("youtu.be/")) 
+        {
+            // Shortened youtu.be/XXXXX
+            extracted = url.split("youtu.be/")[1].split("?")[0];
+        }
+
+        if(extracted)
+        {
+            setVideoId(extracted);
+        }
+    }
+   
 
     return (
         <div>
@@ -30,7 +49,7 @@ const HomePage = () => {
                 type="text" 
                 placeholder="Enter the youtube link" 
                 value={inputValue} 
-                onChange={(e) => setInputValue(e.target.value)}
+                onChange={handleInputChange}
             />
 
             <div>
@@ -38,6 +57,7 @@ const HomePage = () => {
                 socket={socket}
                 roomId={roomId}
                 videoId={videoId}
+                setVideoId = {setVideoId}
                 />
             </div>
         </div>

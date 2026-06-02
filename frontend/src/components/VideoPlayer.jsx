@@ -1,7 +1,7 @@
-import { useVideoSync } from "../hooks/useVideoSync.js";
-const VideoPlayer = ({socket, roomId, videoId}) => {
-
-    const {onPlayerReady, handleStateChange } = useVideoSync(socket);
+import { useSyncLogic } from "../hooks/useSyncLogic.js";
+import YouTube from 'react-youtube';
+const VideoPlayer = ({socket, roomId, videoId, setVideoId}) => {
+    const {onPlayerReady, handleStateChange } = useSyncLogic(socket, roomId, videoId, setVideoId);
 
     const opts = {
         height: '500',

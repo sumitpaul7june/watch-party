@@ -1,5 +1,7 @@
 import { Server } from "socket.io";
 import roomHandler from "./src/handlers/roomHandler.js";
+import videoHandler from "./src/handlers/videoHandler.js";
+import { roomStore } from "./src/store/roomStore.js";
 export function initSocket(server) {
 
     // It hooks the socketio into the server and configured to allow cors requests and it's methods.
@@ -14,11 +16,15 @@ export function initSocket(server) {
         console.log(`User is connected: ${socket.id}`);
 
         // Handle video-command from users
+        videoHandler(socket);
+
+        // Handle room management
         roomHandler(socket);
 
         // When the user gets disconnected
         socket.on('disconnect', () => {
             console.log(`User disconnected: `, socket.id);
+            roomStore.removeUserFromAllRooms(socket.id);
         });
 
     })
