@@ -1,7 +1,20 @@
 import isValidVideoCommand from '../utils/videoValidators.js';
+import { roomStore } from '../store/roomStore.js';
 
 
 const videoHandler = (socket) => {
+    // Handle video state synchronization
+    socket.on('video-id', (data) => {
+        const { videoId, roomId } = data;
+        if (!videoId || !roomId) return;
+
+        // Persist video state in memory
+        roomStore.setRoomVideo(roomId, videoId);
+
+        // Broadcast video state to peers
+        socket.to(roomId).emit('video-id', videoId);
+    });
+
     // Listen for video commands from this user
     socket.on('video-command', (data) => {
         console.log(`Command received from ${socket.id}: `, data);

@@ -1,6 +1,7 @@
 const rooms = new Map();
 
 
+
 class RoomStore {
     // Add a user to the room
     joinRoom(roomId, userId) {
@@ -8,7 +9,8 @@ class RoomStore {
             rooms.set(roomId, {
                 roomId: roomId,
                 users: new Set(),
-                videoId: ''
+                videoId: '',
+                chatHistory: []
             });
         }
         const room = rooms.get(roomId);
@@ -53,7 +55,7 @@ class RoomStore {
     // Check if the room has reached max capacity
     isRoomFull(roomId) {
         const size = this.getRoom(roomId)?.users.size || 0;
-        return size >= 2;
+        return size >= 4;
     }
 
     // Clean up a user from all rooms when they disconnect
@@ -68,6 +70,12 @@ class RoomStore {
         }
     }
 
+    addChatMessage(roomId, messageObject) {
+        const room = this.getRoom(roomId);
+        if (room && messageObject) {
+            room.chatHistory.push(messageObject);
+        }
+    }
 
 
 };

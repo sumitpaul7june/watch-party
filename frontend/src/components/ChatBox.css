@@ -1,0 +1,93 @@
+/* Restrict overall chat size */
+.chat-container {
+    width: 350px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Basic Chat Box Layout */
+.chatMessages {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 15px;
+    height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    background-color: #f9f9f9;
+}
+
+/* Individual Row */
+.chat-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    max-width: 80%;
+}
+
+/* Align My Messages to the Right */
+.my-message {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+/* Align Other Messages to the Left */
+.other-message {
+    align-self: flex-start;
+}
+
+/* Avatar Image */
+.profile-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #fff;
+    border: 1px solid #ccc;
+}
+
+/* Message Bubble */
+.text-message {
+    background-color: #e4e6eb;
+    padding: 10px 14px;
+    border-radius: 18px;
+    color: #050505;
+    font-size: 15px;
+    word-break: break-word;
+}
+
+/* My Message Bubble Colors */
+.my-message .text-message {
+    background-color: #0084ff;
+    color: white;
+}
+
+/* Input Area */
+.chatInput {
+    display: flex;
+    gap: 10px;
+}
+
+.chatInput input {
+    flex-grow: 1;
+    padding: 12px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    outline: none;
+    font-size: 15px;
+}
+
+.chatInput button {
+    padding: 0 20px;
+    border-radius: 20px;
+    border: none;
+    background-color: #0084ff;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.chatInput button:hover {
+    background-color: #0073e6;
+}

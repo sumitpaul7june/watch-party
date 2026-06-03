@@ -1,4 +1,4 @@
-function ErrorPage()
+const ErrorPage = () =>
 {
     return(
         <div>

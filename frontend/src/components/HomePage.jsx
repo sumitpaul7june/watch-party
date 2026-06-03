@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router';
 import { useRoomManagement } from '../hooks/useRoomManagement.js';
 import VideoPlayer from './VideoPlayer.jsx';
+import ChatBox from './ChatBox.jsx';
 import { socket } from '../socket.js';
 
 const HomePage = () => {
@@ -58,6 +59,11 @@ const HomePage = () => {
                 videoId={videoId}
                 setVideoId = {setVideoId}
                 />
+            </div>
+            
+           
+            <div className="chat-section">
+                <ChatBox roomId={roomId} />
             </div>
         </div>
     );

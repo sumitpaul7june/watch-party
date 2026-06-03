@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import roomHandler from "./src/handlers/roomHandler.js";
 import videoHandler from "./src/handlers/videoHandler.js";
+import chatHandler from "./src/handlers/chatHandler.js";
 import { roomStore } from "./src/store/roomStore.js";
 export function initSocket(server) {
 
@@ -20,6 +21,9 @@ export function initSocket(server) {
 
         // Handle room management
         roomHandler(socket);
+
+        // Handle chat messages
+        chatHandler(socket);
 
         // When the user gets disconnected
         socket.on('disconnect', () => {
