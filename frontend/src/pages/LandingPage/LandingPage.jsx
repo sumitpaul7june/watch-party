@@ -1,8 +1,8 @@
 import { useState } from "react";
 import {useNavigate } from "react-router";
-import { socket } from "../socket.js";
+import { socket } from "../../socket.js";
 
-const CreateRoom = () =>
+const LandingPage = () =>
 {
     
     const navigate = useNavigate();
@@ -51,4 +51,4 @@ const CreateRoom = () =>
     );
 }
 
-export default CreateRoom;
+export default LandingPage;

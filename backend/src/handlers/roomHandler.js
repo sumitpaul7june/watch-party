@@ -5,6 +5,10 @@ const roomHandler = (socket) => {
     socket.on('join-room', (roomId) => {
         if (!roomId) return;
 
+        if (roomStore.isUserInRoom(roomId, socket.id)) {
+            return;
+        }
+
         // Enforce room capacity limits
         if (roomStore.isRoomFull(roomId)) {
             console.log('Room capacity exceeded, rejecting join request');
@@ -17,14 +21,22 @@ const roomHandler = (socket) => {
 
         // Register user in store and sync current video state
         const room = roomStore.joinRoom(roomId, socket.id);
-        if (room.videoId) {
-            socket.emit('video-id', room.videoId);
+        if (room.mediaSource) {
+            socket.emit('media-source', room.mediaSource);
         }
 
         // Sync chat history to the newly joined user
         if (room.chatHistory && room.chatHistory.length > 0) {
             socket.emit('chat-history', room.chatHistory);
         }
+    });
+
+    socket.on('leave-room', (roomId) => {
+        if (!roomId) return;
+
+        socket.leave(roomId);
+        roomStore.leaveRoom(roomId, socket.id);
+        console.log(`User ${socket.id} left room ${roomId}`);
     });
 
     // Handle pre-flight room capacity check
@@ -35,6 +47,7 @@ const roomHandler = (socket) => {
             callback({ status: 'ok' });
         }
     });
+
 
 
 }

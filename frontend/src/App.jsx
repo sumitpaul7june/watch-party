@@ -1,17 +1,17 @@
-import CreateRoom from "./components/CreateRoom";
 import { createBrowserRouter, RouterProvider } from "react-router";
-import HomePage from "./components/HomePage";
-import ErrorPage from "./components/ErrorPage";
+import RoomPage from "./pages/RoomPage/RoomPage";
+import ErrorPage from "./pages/ErrorPage/ErrorPage";
+import LandingPage from "./pages/LandingPage/LandingPage";
 function App()
 {
   const router = createBrowserRouter([
     {
       path: '/',
-      element: <CreateRoom/>
+      element: <LandingPage/>
     },
     {
       path: '/home/:roomId',
-      element: <HomePage/>
+      element: <RoomPage/>
     },
     {
       path: '*',

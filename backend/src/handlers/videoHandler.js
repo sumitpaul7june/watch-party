@@ -1,18 +1,20 @@
 import isValidVideoCommand from '../utils/videoValidators.js';
 import { roomStore } from '../store/roomStore.js';
+import { canAccessRoom } from '../utils/socketGuards.js';
 
 
 const videoHandler = (socket) => {
     // Handle video state synchronization
-    socket.on('video-id', (data) => {
-        const { videoId, roomId } = data;
-        if (!videoId || !roomId) return;
+    socket.on('media-source', (data) => {
+        const { roomId, mediaSource } = data;
+        if (!roomId || !mediaSource) return;
+        if (!canAccessRoom(socket, roomId)) return;
 
-        // Persist video state in memory
-        roomStore.setRoomVideo(roomId, videoId);
 
-        // Broadcast video state to peers
-        socket.to(roomId).emit('video-id', videoId);
+        roomStore.setRoomMediaSource(roomId, mediaSource);
+
+
+        socket.to(roomId).emit('media-source', mediaSource);
     });
 
     // Listen for video commands from this user
@@ -20,7 +22,7 @@ const videoHandler = (socket) => {
         console.log(`Command received from ${socket.id}: `, data);
 
         // Validate the payload before broadcasting it to other end user.
-        if (!isValidVideoCommand(data) || !data.roomId) {
+        if (!isValidVideoCommand(data) || !canAccessRoom(socket, data.roomId)) {
             console.log('backend command data: ', data);
             console.log("Invalid video command payload dropped.");
             return;

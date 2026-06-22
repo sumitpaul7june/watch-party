@@ -7,17 +7,15 @@ export const useRoomManagement = (roomId, socket) => {
 
         socket.emit('join-room', roomId);
 
-        // Listen for a full room error from the sever
-        socket.on('full-room-error', (roomId) => {
-            alert(`This room is full ${roomId}. Please try join other rooms`);
-        });
+        const handleFullRoomError = (fullRoomId) => {
+            alert(`This room is full ${fullRoomId}. Please try join other rooms`);
+        };
 
-        // Cleanup on unmount
+        socket.on('full-room-error', handleFullRoomError);
+
         return () => {
-            socket.off('full-room-error');
+            socket.emit('leave-room', roomId);
+            socket.off('full-room-error', handleFullRoomError);
         }
     }, [socket, roomId]);
-
 };
-
-

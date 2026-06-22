@@ -1,13 +1,16 @@
 import { roomStore } from '../store/roomStore.js';
+import { canAccessRoom } from '../utils/socketGuards.js';
 
 const chatHandler = (socket) => {
     // Handle chat message routing
     socket.on('chat-message', (data) => {
         const { roomId, currentText } = data;
+        const text = currentText?.trim();
+        if (!text || !canAccessRoom(socket, roomId)) return;
 
         // Construct message payload
         const messageObject = {
-            text: currentText,
+            text,
             senderId: socket.id
         };
 

@@ -1,5 +1,6 @@
-const rooms = new Map();
+import { MAX_CHAT_HISTORY, MAX_ROOM_USERS } from '../config/roomConfig.js';
 
+const rooms = new Map();
 
 
 class RoomStore {
@@ -9,7 +10,7 @@ class RoomStore {
             rooms.set(roomId, {
                 roomId: roomId,
                 users: new Set(),
-                videoId: '',
+                mediaSource: null,
                 chatHistory: []
             });
         }
@@ -25,25 +26,17 @@ class RoomStore {
             room.users.delete(userId);
 
             // Cleanup empty rooms to free memory
-            if (rooms.users.size === 0) {
+            if (room.users.size === 0) {
                 rooms.delete(roomId);
             }
         }
     }
 
-    // Update the videoId for a room
-    setRoomVideo(roomId, videoId) {
+    // Set the media source for the room
+    setRoomMediaSource(roomId, mediaSource) {
         const room = rooms.get(roomId);
         if (room) {
-            room.videoId = videoId;
-        }
-        else {
-            // If the room somehow doesn't exist but a video ID is set, create it
-            rooms.set(roomId, {
-                roomId: roomId,
-                users: new Set(),
-                videoId: videoId
-            });
+            room.mediaSource = mediaSource;
         }
     }
 
@@ -55,7 +48,11 @@ class RoomStore {
     // Check if the room has reached max capacity
     isRoomFull(roomId) {
         const size = this.getRoom(roomId)?.users.size || 0;
-        return size >= 4;
+        return size >= MAX_ROOM_USERS;
+    }
+
+    isUserInRoom(roomId, userId) {
+        return this.getRoom(roomId)?.users.has(userId) || false;
     }
 
     // Clean up a user from all rooms when they disconnect
@@ -74,6 +71,9 @@ class RoomStore {
         const room = this.getRoom(roomId);
         if (room && messageObject) {
             room.chatHistory.push(messageObject);
+            if (room.chatHistory.length > MAX_CHAT_HISTORY) {
+                room.chatHistory.shift();
+            }
         }
     }
 
