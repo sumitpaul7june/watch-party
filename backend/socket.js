@@ -3,6 +3,9 @@ import roomHandler from "./src/handlers/roomHandler.js";
 import videoHandler from "./src/handlers/videoHandler.js";
 import chatHandler from "./src/handlers/chatHandler.js";
 import { roomStore } from "./src/store/roomStore.js";
+import { socketAuthMiddleware } from './src/middleware/socketAuth.js';
+
+
 export function initSocket(server) {
 
     // It hooks the socketio into the server and configured to allow cors requests and it's methods.
@@ -12,6 +15,8 @@ export function initSocket(server) {
             methods: ["GET", "POST"],
         }
     });
+
+    io.use(socketAuthMiddleware);
 
     io.on('connection', (socket) => {
         console.log(`User is connected: ${socket.id}`);

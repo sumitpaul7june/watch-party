@@ -20,3 +20,8 @@ export const registerApi = async (name, username, email, password) => {
     const response = await axios.post('http://localhost:8080/api/auth/register', { name, username, email, password });
     return response.data;
 };
+
+export const loginAsGuestApi = async () => {
+    const response = await axios.get('http://localhost:8080/api/auth/guest');
+    return response.data;
+}

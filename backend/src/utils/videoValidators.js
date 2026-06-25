@@ -1,10 +1,10 @@
 const mediaCommandValidators = {
     youtube: ({ stateCode }) => {
-        stateCode === 1 || stateCode === 2 || stateCode === 3;
+        return stateCode === 1 || stateCode === 2 || stateCode === 3;
     },
 
     direct: ({ action }) => {
-        action === "play" || action === "pause" || action === "seek";
+        return action === "play" || action === "pause" || action === "seek";
     }
 };
 

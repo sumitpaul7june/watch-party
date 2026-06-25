@@ -23,7 +23,7 @@ export const registerUser = async (req, res) => {
 
         // 4. Generate a secure token so they don't have to log in again immediately
         const token = jwt.sign({ id: newUser.id, username: newUser.username }, process.env.JWT_SECRET, { expiresIn: '7d' });
-        
+
         // Return 201 Created status
         res.status(201).json({ message: "User created", user: newUser, token });
 
@@ -65,7 +65,7 @@ export const loginUser = async (req, res) => {
 
         // 3. Generate the VIP pass (JWT)
         const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '7d' })
-        
+
         // Return standard 200 OK
         res.json({ message: "Login successful", user: { id: user.id, username: user.username }, token });
 
@@ -74,3 +74,26 @@ export const loginUser = async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 };
+
+
+// --- GUEST CONTROLLER ---
+
+export const generateGuestToken = async (req, res) => {
+    try {
+        // 1. Generate a random identity
+        const guestId = `guest_${Math.random().toString(36).substring(2, 9)}`;
+        const guestUsername = `Guest_${Math.floor(Math.random() * 10000)}`;
+        const fakeUser = { id: guestId, username: guestUsername };
+
+        // 2. Sign a real JWT token valid for 24 hours
+        const token = jwt.sign(fakeUser, process.env.JWT_SECRET, { expiresIn: '24h' });
+        // 3. Return it just like a normal login
+        res.status(200).json({ message: "Guest session created", user: fakeUser, token });
+    }
+
+    catch (err) {
+        res.status(500).json({ error: 'Server error generating guest token' });
+
+    }
+
+}

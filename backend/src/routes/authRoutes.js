@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerUser, loginUser } from '../controllers/authController.js';
+import { registerUser, loginUser, generateGuestToken } from '../controllers/authController.js';
 
 const router = express.Router();
 
@@ -8,5 +8,8 @@ router.post('/register', registerUser);
 
 // --- 2. LOGIN ROUTE ---
 router.post('/login', loginUser);
+
+// Guest URL Route
+router.get('/guest', generateGuestToken);
 
 export default router;

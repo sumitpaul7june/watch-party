@@ -4,17 +4,23 @@ const rooms = new Map();
 
 
 class RoomStore {
-    // Add a user to the room
+    // --- ROOM STORE MANAGER ---
+
+    // Creates a brand new empty room
+    createRoom(roomId) {
+        rooms.set(roomId, {
+            roomId: roomId,
+            users: new Set(),
+            mediaSource: null,
+            chatHistory: []
+        });
+    }
+
+    // Attempt to add a user to a room. Returns null if the room doesn't exist!
     joinRoom(roomId, userId) {
-        if (!rooms.has(roomId)) {
-            rooms.set(roomId, {
-                roomId: roomId,
-                users: new Set(),
-                mediaSource: null,
-                chatHistory: []
-            });
-        }
         const room = rooms.get(roomId);
+        if (!room) return null; // Prevent "ghost rooms" from being auto-created
+
         room.users.add(userId);
         return room;
     }
@@ -26,9 +32,13 @@ class RoomStore {
             room.users.delete(userId);
 
             // Cleanup empty rooms to free memory
+            // 🔥 TEMPORARILY DISABLED: React 18 Strict Mode mounts/unmounts hooks twice really fast.
+            // This was causing the room to be destroyed before the second mount could join it!
+            /*
             if (room.users.size === 0) {
                 rooms.delete(roomId);
             }
+            */
         }
     }
 
