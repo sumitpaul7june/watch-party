@@ -2,14 +2,18 @@ import { useRef } from "react";
 import { useRoomSocket } from "../../../../hooks/useRoomSocket.js";
 
 export const useDirectSync = (socket, roomId) => {
+
+    // Accessing the native HTML video element
     const videoRef = useRef(null);
 
+    // Prevent socket command bouncing between users forever
     const ignoredEvents = useRef({
         play: false,
         pause: false,
         seek: false
-    });
+    })
 
+    // Handle incoming video commands
     const onVideoCommand = (data) => {
         if (data.mediaType !== "direct") return;
 

@@ -9,7 +9,7 @@ export const useRoomSocket = (socket, roomId, onVideoCommand) => {
         socket.on('video-command', onVideoCommand);
 
         return () => {
-            socket.off('video-command', onVideoCommand);
+            socket.off('video-command', (onVideoCommand));
         };
     }, [socket, onVideoCommand]);
 

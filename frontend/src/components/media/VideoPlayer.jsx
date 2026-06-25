@@ -16,11 +16,11 @@ const VideoPlayer = ({ socket, roomId, mediaSource }) => {
 
         case "direct":
             return(
-            <DirectPlayer
-                socket={socket}
-                roomId={roomId}
-                mediaSource={mediaSource}
-            />);
+                <DirectPlayer
+                    socket={socket}
+                    roomId={roomId}
+                    mediaSource={mediaSource}
+                />);
 
         default:
             return <div>This media type is not supported yet.</div>;

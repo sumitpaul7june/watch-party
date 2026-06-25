@@ -1,14 +1,29 @@
 import express from 'express';
 import cors from 'cors';
 import http from 'http';
-import path from 'path';
-import { Server } from 'socket.io';
 import { initSocket } from './socket.js';
+import { pool } from './src/config/db.js';
+import { initDB } from './src/config/init.js';
+import authRoutes from './src/routes/authRoutes.js';
+
 
 const app = express();
+initDB();
 
-// Let react app on port 5173 connect to backend.
+
+// Let react app connect to backend. This MUST be before routes!
 app.use(cors());
+
+// This tells Express to convert incoming data into JSON so we can read req.body
+app.use(express.json());
+
+// Mount our new routes
+app.use('/api/auth', authRoutes);
+
+
+
+
+// (CORS moved to the top)
 
 const PORT = 8080;
 
