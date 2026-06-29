@@ -70,7 +70,7 @@ class RoomStore {
         for (const [roomId, room] of rooms.entries()) {
             if (room.users.has(userId)) {
                 room.users.delete(userId);
-                if (room.users.size == 0) {
+                if (room.users.size === 0) {
                     rooms.delete(roomId);
                 }
             }

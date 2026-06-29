@@ -4,10 +4,7 @@ import jwt from 'jsonwebtoken';
 
 export const socketAuthMiddleware = (socket, next) => {
 
-    // 🔥 Let's rip open the engine! Check your backend terminal for this log:
-    console.log("================= HANDSHAKE OBJECT =================");
-    console.log(socket.handshake); // Make sure this is .handshake, not just socket!
-    console.log("====================================================");
+    // Extract token from handshake
 
     const token = socket.handshake.auth.token;
 

@@ -1,5 +1,8 @@
-// 1. UI Manager: Responsible strictly for manipulating the DOM
-
+/* 
+ * 1. UI Manager (The Face)
+ * Job: Strictly handles the HTML DOM. Grabbing the input, clicking the button, changing text.
+ * It knows absolutely nothing about Chrome extensions or WebSockets.
+ */
 class UIManager {
     constructor() {
         this.roomInput = document.getElementById('room-input');
@@ -18,34 +21,43 @@ class UIManager {
     onJoinClick(callback) {
         this.joinBtn.addEventListener('click', callback);
     }
-};
+}
 
-// 2. Communicator: Responsible strictly for talking to the background script
+/*
+ * 2. Communicator (The Walkie Talkie)
+ * Job: Shoots messages from our tiny popup window down to the invisible Background Script.
+ */
+function joinRoom(roomId, onResponse) {
+    chrome.runtime.sendMessage({ action: "JOIN_ROOM", roomId: roomId }, onResponse);
+}
 
-class ExtensionCommunicator {
-    static joinRoom(roomId, onResponse) {
-        chrome.runtime.sendMessage({ action: "JOIN_ROOM", roomId: roomId }, onResponse);
-    }
-};
+/*
+ * 3. The Orchestrator
+ * Job: Wires the Face and the Walkie Talkie together when the popup opens.
+ */
+function init() {
+    const ui = new UIManager();
 
-const ui = new UIManager();
-
-ui.onJoinClick(() => {
-    const roomId = ui.getRoomId();
-    if (!roomId) {
-        ui.setStatus("Please enter a room ID!");
-        return;
-    }
-
-    ui.setStatus("Joining");
-
-    // Send the messafe and handle the callback
-
-    ExtensionCommunicator.joinRoom(roomId, (response) => {
-        if (response && response.success) {
-            ui.setStatus(`Connected to ${roomId}!`);
-        } else {
-            ui.setStatus("Failed to connect.");
+    ui.onJoinClick(() => {
+        const roomId = ui.getRoomId();
+        
+        if (!roomId) {
+            ui.setStatus("Please enter a room ID!");
+            return;
         }
-    })
-})
+
+        ui.setStatus("Joining...");
+
+        // Fire off the walkie talkie and wait for the Background Script to reply
+        joinRoom(roomId, (response) => {
+            if (response && response.success) {
+                ui.setStatus(`Connected to ${roomId}!`);
+            } else {
+                ui.setStatus("Failed to connect.");
+            }
+        });
+    });
+}
+
+// Boot up the popup!
+init();

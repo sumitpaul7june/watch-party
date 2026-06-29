@@ -8,10 +8,10 @@ import { socketAuthMiddleware } from './src/middleware/socketAuth.js';
 
 export function initSocket(server) {
 
-    // It hooks the socketio into the server and configured to allow cors requests and it's methods.
+    // It hooks the socketio into the server and configured to allow cors requests
     const io = new Server(server, {
         cors: {
-            origin: "http://localhost:5173",
+            origin: "*", // Allow all origins including Chrome Extension
             methods: ["GET", "POST"],
         }
     });

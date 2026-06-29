@@ -5,6 +5,10 @@ const mediaCommandValidators = {
 
     direct: ({ action }) => {
         return action === "play" || action === "pause" || action === "seek";
+    },
+
+    netflix: ({ action }) => {
+        return action === "play" || action === "pause" || action === "seek";
     }
 };
 

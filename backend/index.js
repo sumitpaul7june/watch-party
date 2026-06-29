@@ -11,8 +11,10 @@ const app = express();
 initDB();
 
 
-// Let react app connect to backend. This MUST be before routes!
-app.use(cors());
+// Let react app and Chrome Extension connect to backend.
+app.use(cors({
+    origin: '*' // Allow all origins for development (includes chrome-extension://)
+}));
 
 // This tells Express to convert incoming data into JSON so we can read req.body
 app.use(express.json());

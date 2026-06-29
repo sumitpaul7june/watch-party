@@ -14,11 +14,11 @@ export const registerUser = async (req, res) => {
     try {
         // 2. Cryptographically secure the password
         const salt = await bcrypt.genSalt(10);
-        const passworHash = await bcrypt.hash(password, salt);
+        const passwordHash = await bcrypt.hash(password, salt);
 
         // 3. Persist to Postgres database
         const SQL = `INSERT INTO users(username, password_hash) VALUES ($1, $2) RETURNING id, username, created_at`;
-        const result = await pool.query(SQL, [username, passworHash]);
+        const result = await pool.query(SQL, [username, passwordHash]);
         const newUser = result.rows[0];
 
         // 4. Generate a secure token so they don't have to log in again immediately
