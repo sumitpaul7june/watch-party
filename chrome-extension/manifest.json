@@ -1,0 +1,29 @@
+{
+    "manifest_version": 3,
+    "name": "Watch Party Sync",
+    "version": "1.0",
+    "description": "Syncs Netflix playback with your Watch Party room",
+    "action": {
+        "default_popup": "popup/popup.html"
+    },
+    "background": {
+        "service_worker": "background.js",
+        "type": "module"
+    },
+    "content_scripts": [
+        {
+            "matches": ["*://*.netflix.com/*"],
+            "js": ["content.js"]
+        }
+    ],
+    "permissions": [
+        "storage",
+        "activeTab",
+        "scripting"
+    ],
+    "host_permissions": [
+        "http://localhost:8080/*",
+        "*://*.netflix.com/*"
+    ]
+    
+}
