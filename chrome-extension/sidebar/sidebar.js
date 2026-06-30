@@ -2,6 +2,12 @@
  * 1. Sidebar UI (The Face)
  * Job: Strictly handles rendering chat bubbles, auto-scrolling, and reading the input box.
  */
+
+// Prevent Netflix from intercepting typing in the chat!
+document.addEventListener('keydown', (e) => e.stopPropagation(), true);
+document.addEventListener('keyup', (e) => e.stopPropagation(), true);
+document.addEventListener('keypress', (e) => e.stopPropagation(), true);
+
 class SidebarUI {
     constructor() {
         this.messagesList = document.getElementById('chat-messages');
@@ -16,7 +22,25 @@ class SidebarUI {
     }
 
     setRoomId(roomId) {
-        this.roomBadge.innerText = `Room: ${roomId}`;
+        this.roomBadge.innerText = `Copy Code: ${roomId}`;
+        this.roomBadge.onclick = () => {
+            // Get the Netflix URL passed from content.js
+            const urlParams = new URLSearchParams(window.location.search);
+            const netflixUrlStr = urlParams.get('url');
+            
+            let textToCopy = roomId; // Fallback
+            if (netflixUrlStr) {
+                try {
+                    const url = new URL(netflixUrlStr);
+                    url.searchParams.set('wpRoom', roomId);
+                    textToCopy = url.toString();
+                } catch(e) {}
+            }
+            
+            navigator.clipboard.writeText(textToCopy);
+            this.roomBadge.innerText = 'Copied!';
+            setTimeout(() => { this.roomBadge.innerText = `Copy Code: ${roomId}`; }, 2000);
+        };
     }
 
     getInputValue() {
@@ -28,7 +52,7 @@ class SidebarUI {
     }
 
     setParticipantCount(count) {
-        document.getElementById('participant-count').innerText = `👥 ${count}`;
+        document.getElementById('participant-count').innerHTML = `${count} <span class="participant-icon">👤</span>`;
     }
 
     appendMessage(messageObj) {
@@ -36,11 +60,11 @@ class SidebarUI {
         
         const li = document.createElement('li');
         let rowClass = 'chat-row';
-        if (type === 'system') {
-            rowClass += ' system';
-        } 
         if (senderId === this.myId) {
             rowClass += ' mine';
+        }
+        if (type === 'system') {
+            rowClass += ' system-row';
         }
         li.className = rowClass;
 
@@ -48,11 +72,13 @@ class SidebarUI {
         const avatarUrl = `https://api.dicebear.com/9.x/bottts/svg?seed=${senderId}`;
         const displayName = senderName || 'Anonymous';
 
+        const style = type === 'system' ? 'font-style: italic; opacity: 0.8;' : '';
+
         li.innerHTML = `
             <img class="avatar" src="${avatarUrl}" alt="avatar" />
-            <div class="message-content">
+            <div class="message-bubble">
                 <span class="sender-name">${displayName}</span>
-                <span class="text">${text}</span>
+                <span class="text-message" style="${style}">${text}</span>
             </div>
         `;
 

@@ -11,11 +11,15 @@
 <body>
     <div id="chat-container">
         <div id="chat-header">
-            <h2>WatchParty</h2>
-            <div class="header-badges">
-                <span id="room-badge">Connecting...</span>
-                <span id="participant-count">👥 1</span>
+            <div class="chat-title-group">
+                <span>FluxParty</span>
+                <span id="participant-count" class="participant-count">
+                    1 <span class="participant-icon">👤</span>
+                </span>
             </div>
+            <button id="room-badge" class="btn-copy-code" title="Click to copy Room Code">
+                Connecting...
+            </button>
         </div>
 
         <ul id="chat-messages">

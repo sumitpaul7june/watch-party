@@ -3,7 +3,6 @@ import cors from 'cors';
 import http from 'http';
 import 'dotenv/config';
 import { initSocket } from './socket.js';
-import { pool } from './src/config/db.js';
 import { initDB } from './src/config/init.js';
 import authRoutes from './src/routes/authRoutes.js';
 
@@ -18,7 +17,7 @@ app.use(cors({
     origin: function (origin, callback) {
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
-        
+
         // Allow ANY chrome extension to connect regardless of its generated ID
         if (origin.startsWith('chrome-extension://')) {
             return callback(null, true);

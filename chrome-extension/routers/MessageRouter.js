@@ -99,7 +99,15 @@ export class MessageRouter {
             // Inject the sidebar into the active tab
             if (tabId) {
                 chrome.tabs.sendMessage(tabId, { action: "INJECT_SIDEBAR" })
-                    .catch(err => console.error("MessageRouter: Failed to inject sidebar.", err));
+                    .catch(err => {
+                        console.log("MessageRouter: Content script not found, injecting dynamically...", err);
+                        chrome.scripting.executeScript({
+                            target: { tabId: tabId },
+                            files: ['content.js']
+                        }).then(() => {
+                            chrome.tabs.sendMessage(tabId, { action: "INJECT_SIDEBAR" }).catch(() => {});
+                        }).catch(e => console.error("MessageRouter: Dynamic injection failed.", e));
+                    });
             }
 
             sendResponse({ success: true, roomId: result.roomId });
@@ -127,7 +135,15 @@ export class MessageRouter {
             if (tabId) {
                 console.log(`MessageRouter: Injecting into exact tab ID: ${tabId}`);
                 chrome.tabs.sendMessage(tabId, { action: "INJECT_SIDEBAR" })
-                    .catch(err => console.error("MessageRouter: Failed to inject. Did you refresh the page?", err));
+                    .catch(err => {
+                        console.log("MessageRouter: Content script not found, injecting dynamically...", err);
+                        chrome.scripting.executeScript({
+                            target: { tabId: tabId },
+                            files: ['content.js']
+                        }).then(() => {
+                            chrome.tabs.sendMessage(tabId, { action: "INJECT_SIDEBAR" }).catch(() => {});
+                        }).catch(e => console.error("MessageRouter: Dynamic injection failed.", e));
+                    });
             } else {
                 console.warn("MessageRouter: No tabId provided to inject sidebar into!");
             }

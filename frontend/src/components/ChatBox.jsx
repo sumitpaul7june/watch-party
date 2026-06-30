@@ -95,22 +95,12 @@ const ChatBox = ({roomId}) => {
             <div className="chatMessages">
             {
                 messages.map( (msg, index) => {
-                    if (msg.type === 'system') {
-                        return (
-                            <div key={index} className="chat-row system-message">
-                                <div className="system-bubble">
-                                    {msg.senderName} {msg.text}
-                                </div>
-                            </div>
-                        );
-                    }
-
                     return (
-                        <div key={index} className={`chat-row ${msg.senderId === socket.id ? 'my-message' : 'other-message'}`}>
+                        <div key={index} className={`chat-row ${msg.senderId === socket.id ? 'my-message' : 'other-message'} ${msg.type === 'system' ? 'system-row' : ''}`}>
                             <img src={`https://api.dicebear.com/9.x/bottts/svg?seed=${msg.senderId}`} className="profile-img" alt="" />
                             <div className="message-bubble">
                                 <span className="sender-name">{msg.senderName || 'Anonymous'}</span>
-                                <div className="text-message">{msg.text}</div>
+                                <div className="text-message" style={msg.type === 'system' ? { fontStyle: 'italic', opacity: 0.8 } : {}}>{msg.text}</div>
                             </div>
                         </div>
                     );

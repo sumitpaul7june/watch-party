@@ -11,26 +11,26 @@
 
     <!-- View 1: When you are NOT in a party -->
     <div id="join-view">
-        <button id="create-btn" style="margin-bottom: 16px;">Create Room</button>
-        <div class="flex-row" style="margin-bottom: 12px;">
+        <button id="create-btn">Create Room</button>
+        <div class="flex-row join-input-row">
             <input type="text" id="room-input" placeholder="Enter Room ID" />
             <button id="join-btn">Join</button>
         </div>
-        <p id="status" style="font-size: 13px; color: #ef4444; margin: 0; min-height: 20px;"></p>
+        <p id="status"></p>
     </div>
 
     <!-- View 2: When you ARE in a party -->
-    <div id="management-view" style="display: none;">
+    <div id="management-view">
         <h2>Party Management</h2>
-        <p style="margin: 8px 0; color: #94a3b8; font-size: 14px;">You are connected to:</p>
-        <p style="margin: 0 0 16px 0;"><strong id="current-room-id" style="font-size: 1.5em; color: #3b82f6;">...</strong></p>
+        <p class="connected-label">You are connected to:</p>
+        <p class="room-id-container"><strong id="current-room-id">...</strong></p>
 
-        <button id="copy-link-btn" class="secondary-btn" style="margin-bottom: 8px;">📋 Copy Room Code</button>
-        <p id="copy-status" style="font-size: 13px; color: #10b981; margin: 0 0 16px 0; min-height: 20px;"></p>
+        <button id="copy-link-btn" class="secondary-btn">Copy Room Code</button>
+        <p id="copy-status"></p>
         
         <div class="flex-row">
-            <button id="toggle-chat-btn" class="secondary-btn" style="flex: 1;">Toggle Chat</button>
-            <button id="disconnect-btn" class="danger-btn" style="flex: 1;">Disconnect</button>
+            <button id="toggle-chat-btn" class="secondary-btn">Toggle Chat</button>
+            <button id="disconnect-btn" class="danger-btn">Disconnect</button>
         </div>
     </div>
 

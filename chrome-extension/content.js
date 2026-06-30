@@ -22,7 +22,7 @@ class SidebarManager {
         
         console.log("WatchParty SidebarManager: Injecting Sidebar!");
         const iframe = document.createElement('iframe');
-        iframe.src = chrome.runtime.getURL('sidebar/sidebar.html');
+        iframe.src = chrome.runtime.getURL('sidebar/sidebar.html') + '?url=' + encodeURIComponent(window.location.href);
         iframe.id = this.iframeId;
         iframe.style.cssText = `
             position: fixed;
@@ -141,10 +141,10 @@ class VideoManager {
             window.postMessage({ type: 'WP_NETFLIX_CMD', action: actionStr }, '*');
         }
 
-        // 3. Lower the shield after 2 seconds (gives Netflix time to buffer without echoing)
+        // 3. Lower the shield after 500ms (gives Netflix time to buffer without echoing)
         setTimeout(() => {
             this.isShieldUp = false;
-        }, 2000);
+        }, 500);
     }
 }
 

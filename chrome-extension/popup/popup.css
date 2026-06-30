@@ -87,3 +87,53 @@ button:hover {
     width: auto;
     padding: 12px 24px;
 }
+
+#create-btn {
+    margin-bottom: 16px;
+}
+
+.join-input-row {
+    margin-bottom: 12px;
+}
+
+#status {
+    font-size: 13px;
+    color: #ef4444;
+    margin: 0;
+    min-height: 20px;
+}
+
+#management-view {
+    display: none;
+}
+
+.connected-label {
+    margin: 8px 0;
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+.room-id-container {
+    margin: 0 0 16px 0;
+}
+
+#current-room-id {
+    font-size: 1.5em;
+    color: #3b82f6;
+}
+
+#copy-link-btn {
+    margin-bottom: 8px;
+}
+
+#copy-status {
+    font-size: 13px;
+    color: #10b981;
+    margin: 0 0 16px 0;
+    min-height: 20px;
+}
+
+#toggle-chat-btn,
+#disconnect-btn {
+    flex: 1;
+}
