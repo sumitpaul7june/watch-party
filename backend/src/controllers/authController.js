@@ -3,7 +3,7 @@ import { pool } from '../config/db.js';
 import jwt from 'jsonwebtoken';
 
 // --- REGISTER CONTROLLER ---
-// Handles new user signups. I hash the password before saving to Postgres and issue a 7-day JWT.
+// Handles new user signups. Hashes the password before saving to Postgres and issues a 7-day JWT.
 export const registerUser = async (req, res) => {
     const { username, password } = req.body;
 
@@ -78,11 +78,21 @@ export const loginUser = async (req, res) => {
 
 // --- GUEST CONTROLLER ---
 
+// Fun name generator — combines a random adjective with a random animal
+const adjectives = ['Brave', 'Swift', 'Cosmic', 'Chill', 'Funky', 'Sneaky', 'Wild', 'Zen', 'Lucky', 'Epic', 'Mystic', 'Turbo', 'Jolly', 'Shadow', 'Neon'];
+const animals = ['Panda', 'Falcon', 'Fox', 'Otter', 'Wolf', 'Penguin', 'Tiger', 'Koala', 'Eagle', 'Dolphin', 'Lynx', 'Owl', 'Raven', 'Bear', 'Hawk'];
+
+function generateGuestName() {
+    const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+    const animal = animals[Math.floor(Math.random() * animals.length)];
+    return `${adj}${animal}`;
+}
+
 export const generateGuestToken = async (req, res) => {
     try {
-        // 1. Generate a random identity
+        // 1. Generate a random identity with a fun name
         const guestId = `guest_${Math.random().toString(36).substring(2, 9)}`;
-        const guestUsername = `Guest_${Math.floor(Math.random() * 10000)}`;
+        const guestUsername = generateGuestName();
         const fakeUser = { id: guestId, username: guestUsername };
 
         // 2. Sign a real JWT token valid for 24 hours

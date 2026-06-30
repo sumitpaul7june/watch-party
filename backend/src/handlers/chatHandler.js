@@ -8,10 +8,11 @@ const chatHandler = (socket) => {
         const text = currentText?.trim();
         if (!text || !canAccessRoom(socket, roomId)) return;
 
-        // Construct message payload
+        // Construct message payload (pull username from the JWT-decoded socket.user)
         const messageObject = {
             text,
-            senderId: socket.id
+            senderId: socket.id,
+            senderName: socket.user?.username || 'Anonymous'
         };
 
         // Persist message in memory

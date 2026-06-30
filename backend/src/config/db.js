@@ -1,7 +1,7 @@
 import pg from 'pg';
 import dotenv from 'dotenv';
 
-// Load our .env file so we can read DATABASE_URL
+// Load the .env file to read the DATABASE_URL
 
 dotenv.config();
 

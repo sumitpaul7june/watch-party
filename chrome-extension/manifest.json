@@ -14,6 +14,11 @@
         {
             "matches": ["*://*.netflix.com/*"],
             "js": ["content.js"]
+        },
+        {
+            "matches": ["*://*.netflix.com/*"],
+            "js": ["inject.js"],
+            "world": "MAIN"
         }
     ],
     "permissions": [
@@ -24,6 +29,12 @@
     "host_permissions": [
         "http://localhost:8080/*",
         "*://*.netflix.com/*"
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": ["sidebar/sidebar.html"],
+            "matches": ["*://*.netflix.com/*"]
+        }
     ]
     
 }

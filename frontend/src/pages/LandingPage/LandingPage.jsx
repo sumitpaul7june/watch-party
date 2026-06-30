@@ -20,11 +20,13 @@ const LandingPage = () =>
     }
 
     const handleCreateRoom = async () => {
-        // If they aren't logged in, route them straight to login!
+        // If they aren't logged in, auto-create a guest session first
         if (!user) {
-            alert('You must be logged in to create a room!');
-            navigate('/login');
-            return;
+            const guestResult = await loginAsGuest();
+            if (!guestResult.success) {
+                alert('Failed to create guest session');
+                return;
+            }
         }
 
         // Ask the backend for a guaranteed unique code!

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WatchParty Chat</title>
+    <link rel="stylesheet" href="sidebar.css">
+</head>
+
+<body>
+    <div id="chat-container">
+        <div id="chat-header">
+            <h2>WatchParty</h2>
+            <div class="header-badges">
+                <span id="room-badge">Connecting...</span>
+                <span id="participant-count">👥 1</span>
+            </div>
+        </div>
+
+        <ul id="chat-messages">
+            <!-- JavaScript will inject chat bubbles here -->
+        </ul>
+
+        <div id="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off" />
+            <button id="send-btn">Send</button>
+        </div>
+    </div>
+
+    <script src="sidebar.js"></script>
+</body>
+
+</html>

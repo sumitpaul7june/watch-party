@@ -30,6 +30,23 @@ const videoHandler = (socket) => {
 
         // Relay the sync command to everyone else in the room
         socket.to(data.roomId).emit('video-command', data);
+
+        // --- Generate a system chat message for the action ---
+        const actionText = data.action === 'play' ? 'started playing the video' : 
+                           data.action === 'pause' ? 'paused the video' : 
+                           'jumped to a new timestamp';
+                           
+        const systemMessage = {
+            text: actionText,
+            senderId: socket.id,
+            senderName: socket.user?.username || 'Anonymous',
+            type: 'system' // Tag it so the UI knows it's a system event
+        };
+
+        // Persist it and broadcast it so it shows in the chat sidebar
+        roomStore.addChatMessage(data.roomId, systemMessage);
+        socket.to(data.roomId).emit('new-messages', systemMessage);
+        socket.emit('new-messages', systemMessage); // Echo back to the sender
     });
 };
 

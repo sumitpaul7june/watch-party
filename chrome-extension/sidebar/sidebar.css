@@ -1,0 +1,124 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: #141414;
+    color: white;
+}
+
+#chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+#chat-header {
+    background-color: #000000;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border-bottom: 1px solid #333;
+}
+
+#chat-header h2 {
+    margin: 0 0 5px 0;
+    font-size: 18px;
+    font-weight: bold;
+    color: #e50914;
+}
+
+.header-badges {
+    display: flex;
+    gap: 15px;
+    font-size: 13px;
+    color: #b3b3b3;
+    font-weight: bold;
+}
+
+#chat-messages {
+    flex-grow: 1;
+    list-style-type: none;
+    padding: 15px;
+    margin: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.chat-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.chat-row .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #2b2b2b;
+    flex-shrink: 0;
+}
+
+.message-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 32px;
+}
+
+.chat-row .text {
+    font-size: 14px;
+    color: #ffffff;
+    line-height: 1.4;
+}
+
+.chat-row .sender-name {
+    font-size: 11px;
+    color: #e50914;
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+
+/* User's own message Style */
+.chat-row.mine {
+    flex-direction: row-reverse;
+}
+
+.chat-row.mine .message-content {
+    align-items: flex-end;
+}
+
+/* System Message Style (Gray text) */
+.chat-row.system .text {
+    color: #b3b3b3;
+}
+
+#chat-input-area {
+    padding: 15px;
+    background-color: #000000;
+    border-top: 1px solid #333;
+    display: flex;
+    gap: 10px;
+}
+
+#chat-input {
+    flex-grow: 1;
+    padding: 12px 15px;
+    border-radius: 20px;
+    border: 1px solid #333;
+    background-color: #2b2b2b;
+    color: white;
+    outline: none;
+    font-size: 14px;
+}
+
+#send-btn {
+    background-color: transparent;
+    border: none;
+    color: #e50914;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+}

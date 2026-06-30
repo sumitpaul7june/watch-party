@@ -1,13 +1,13 @@
 import { pool } from './db.js';
 
 export const initDB = async () => {
-    // Grab a temporary connection from our pool
+    // Grab a temporary connection from the pool
     const client = await pool.connect();
 
     try {
         console.log('Checking database tables...');
 
-        // Write our SQL command!
+        // Execute the schema initialization SQL command
         await client.query(`
             CREATE TABLE IF NOT EXISTS users (
                 id SERIAL PRIMARY KEY,

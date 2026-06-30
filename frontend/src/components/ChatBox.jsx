@@ -45,7 +45,10 @@ const ChatBox = ({roomId}) => {
                 messages.map( (msg, index) => (
                     <div key={index} className={`chat-row ${msg.senderId === socket.id ? 'my-message' : 'other-message'}`}>
                         <img src={`https://api.dicebear.com/9.x/bottts/svg?seed=${msg.senderId}`} className="profile-img" alt="" />
-                        <div className="text-message">{msg.text}</div>
+                        <div className="message-bubble">
+                            <span className="sender-name">{msg.senderName || 'Anonymous'}</span>
+                            <div className="text-message">{msg.text}</div>
+                        </div>
                     </div>
                 ))}
             </div>

@@ -11,25 +11,22 @@ const app = express();
 initDB();
 
 
-// Let react app and Chrome Extension connect to backend.
+// React app and Chrome Extension connect to backend.
 app.use(cors({
     origin: '*' // Allow all origins for development (includes chrome-extension://)
 }));
 
-// This tells Express to convert incoming data into JSON so we can read req.body
+// Tells Express to convert incoming data into JSON to allow reading req.body
 app.use(express.json());
 
-// Mount our new routes
+// Mount routes
 app.use('/api/auth', authRoutes);
 
 
 
-
-// (CORS moved to the top)
-
 const PORT = 8080;
 
-// Express only handles request-response connection unlike birdirectional peristent communication so we took the help of raw Node js server.
+// Express only handles request-response connections. A raw Node.js HTTP server is used here to support bidirectional persistent WebSockets.
 const server = http.createServer(app);
 
 

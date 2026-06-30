@@ -33,7 +33,23 @@ export function initSocket(server) {
         // When the user gets disconnected
         socket.on('disconnect', () => {
             console.log(`User disconnected: `, socket.id);
-            roomStore.removeUserFromAllRooms(socket.id);
+            const roomsRemovedFrom = roomStore.removeUserFromAllRooms(socket.id);
+            
+            roomsRemovedFrom.forEach(roomId => {
+                const room = roomStore.getRoom(roomId);
+                const newCount = room ? room.users.size : 0;
+                socket.to(roomId).emit('room-update', { count: newCount });
+
+                // Send a system message that the user left
+                const leaveMessage = {
+                    text: 'left the room',
+                    senderId: socket.id,
+                    senderName: socket.user?.username || 'Anonymous',
+                    type: 'system'
+                };
+                roomStore.addChatMessage(roomId, leaveMessage);
+                socket.to(roomId).emit('new-messages', leaveMessage);
+            });
         });
 
     })

@@ -7,10 +7,32 @@
 </head>
 
 <body>
-    <h2>Watch Party</h2>
-    <input type="text" id="room-input" placeholder="Enter Room ID" />
-    <button id="join-btn">Join Room</button>
-    <p id="status"></p>
+    <h1>WatchParty</h1>
+
+    <!-- View 1: When you are NOT in a party -->
+    <div id="join-view">
+        <button id="create-btn" style="width: 100%; margin-bottom: 12px;">Create Room</button>
+        <div style="display: flex; gap: 8px;">
+            <input type="text" id="room-input" placeholder="Enter Room ID" style="flex: 1;" />
+            <button id="join-btn">Join</button>
+        </div>
+        <p id="status"></p>
+    </div>
+
+    <!-- View 2: When you ARE in a party -->
+    <div id="management-view" style="display: none;">
+        <h2>Party Management</h2>
+        <p>You are connected to:</p>
+        <p><strong id="current-room-id" style="font-size: 1.2em; color: #E50914;">...</strong></p>
+
+        <button id="copy-link-btn" style="background: #333; width: 100%; margin-top: 10px;">📋 Copy Party Link</button>
+        <p id="copy-status" style="font-size: 12px; color: #4CAF50; margin: 5px 0 0 0;"></p>
+        
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button id="toggle-chat-btn" style="background: #333; flex: 1;">Toggle Chat</button>
+            <button id="disconnect-btn" style="background: #E50914; flex: 1;">Disconnect</button>
+        </div>
+    </div>
 
     <script src="popup.js"></script>
 </body>
