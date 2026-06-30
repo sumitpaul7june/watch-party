@@ -173,9 +173,13 @@ class NetworkManager {
             msg.payload = payload;
         }
         
-        chrome.runtime.sendMessage(msg, callback).catch(() => {
-            // Background script might be asleep or reloading, safe to ignore
-        });
+        if (typeof callback === 'function') {
+            chrome.runtime.sendMessage(msg, callback);
+        } else {
+            chrome.runtime.sendMessage(msg).catch(() => {
+                // Background script might be asleep or reloading, safe to ignore
+            });
+        }
     }
 }
 

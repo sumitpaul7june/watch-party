@@ -15,7 +15,22 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS
 
 // React app and Chrome Extension connect to backend.
 app.use(cors({
-    origin: allowedOrigins // Use origins from environment variables for scalability
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        
+        // Allow ANY chrome extension to connect regardless of its generated ID
+        if (origin.startsWith('chrome-extension://')) {
+            return callback(null, true);
+        }
+
+        // Check if origin is in the allowed list, or if the list contains '*'
+        if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+            return callback(null, true);
+        }
+
+        return callback(new Error('Not allowed by CORS'), false);
+    }
 }));
 
 // Tells Express to convert incoming data into JSON to allow reading req.body
