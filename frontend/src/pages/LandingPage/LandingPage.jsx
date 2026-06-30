@@ -101,7 +101,7 @@ const LandingPage = () =>
             </div>
 
             <div className="landing-card">
-                <h1 className="landing-title">Watch Party</h1>
+                <h1 className="landing-title">FluxParty</h1>
                 <p className="landing-subtitle">Watch videos in sync with your friends.</p>
 
                 <div className="action-section">

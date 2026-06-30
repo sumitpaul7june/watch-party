@@ -2,6 +2,6 @@
 // This acts as our "environment variables" for the extension, since extensions don't natively support .env files.
 
 export const CONFIG = {
-    // The base URL of our backend server
-    BACKEND_URL: 'http://localhost:8080'
+    // The base URL of our live backend server
+    BACKEND_URL: 'https://fluxparty-backend.onrender.com'
 };

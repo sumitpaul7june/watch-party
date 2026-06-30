@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "Watch Party Sync",
+    "name": "FluxParty",
     "version": "1.0",
-    "description": "Syncs Netflix playback with your Watch Party room",
+    "description": "Syncs Netflix playback with your FluxParty room",
     "action": {
         "default_popup": "popup/popup.html"
     },
