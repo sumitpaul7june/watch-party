@@ -3,8 +3,12 @@
     "name": "FluxParty",
     "version": "1.0",
     "description": "Syncs Netflix playback with your FluxParty room",
+    "icons": {
+        "128": "popup/logo.png"
+    },
     "action": {
-        "default_popup": "popup/popup.html"
+        "default_popup": "popup/popup.html",
+        "default_icon": "popup/logo.png"
     },
     "background": {
         "service_worker": "background.js",
@@ -27,7 +31,6 @@
         "scripting"
     ],
     "host_permissions": [
-        "http://localhost:8080/*",
         "*://*.netflix.com/*"
     ],
     "web_accessible_resources": [
