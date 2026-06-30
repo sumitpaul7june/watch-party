@@ -6,16 +6,16 @@ import { socket } from "../socket.js";
 // 1. Create the globally accessible Context
 export const AuthContext = createContext();
 
-// 2. The Provider component that wraps our app and manages state
+// 2. The Provider component that wraps the app and manages state
 export const AuthProvider = ({children}) => {
     
-    // Hold the logged-in user's data globally so any component can read it
+    // I hold the logged-in user's data globally so any component can read it
     const [user, setUser] = useState(() => {
         const savedUser = localStorage.getItem('watchPartyUser');
         return savedUser ? JSON.parse(savedUser) : null;
     });
 
-    // Automatically connect the socket if the user refreshes the page and is already logged in!
+    // Automatically connect the socket if the user refreshes the page and is already logged in
     useEffect(() => {
         if (user) {
             socket.connect();
@@ -23,6 +23,8 @@ export const AuthProvider = ({children}) => {
     }, [user]);
 
     // --- LOGIN LOGIC ---
+    // Authenticates an existing user and stores their JWT token and user profile in localStorage.
+    // Also explicitly establishes the WebSocket connection post-login.
     const login = async (username, password) => {
         try
         {
@@ -42,6 +44,7 @@ export const AuthProvider = ({children}) => {
     }
 
     // --- REGISTER LOGIC ---
+    // Registers a new user, saves their session data to localStorage, and connects the socket.
     const register = async(name, username, email, password) => {
         try
         {
@@ -60,15 +63,17 @@ export const AuthProvider = ({children}) => {
     }
 
     // --- LOGOUT LOGIC ---
+    // Clears the user's session data and forcefully disconnects the WebSocket.
     const logout = () => {
         setUser(null);
         localStorage.removeItem('watchPartyUser');
         localStorage.removeItem('watchPartyToken');
         
-        socket.disconnect(); // 🔥 KICK THEM OUT OF THE SOCKET
+        socket.disconnect(); // Kicks them out of the socket
     }
 
     // --- GUEST LOGIC ---
+    // Generates a temporary guest token from the backend for users who just want to join a room quickly.
     const loginAsGuest = async () => {
         try
         {
@@ -88,7 +93,7 @@ export const AuthProvider = ({children}) => {
         }
     }
 
-    // 3. Share the state AND the functions with the rest of the app!
+    // 3. Share the state AND the functions with the rest of the app
     return(
         <AuthContext.Provider value={{user, setUser, login, register, logout, loginAsGuest}}>
             {children}

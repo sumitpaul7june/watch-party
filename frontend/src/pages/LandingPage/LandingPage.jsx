@@ -20,7 +20,7 @@ const LandingPage = () =>
     }
 
     const handleCreateRoom = async () => {
-        // If they aren't logged in, auto-create a guest session first
+        // If the user isn't logged in, I auto-create a guest session first
         if (!user) {
             const guestResult = await loginAsGuest();
             if (!guestResult.success) {
@@ -29,7 +29,7 @@ const LandingPage = () =>
             }
         }
 
-        // Ask the backend for a guaranteed unique code!
+        // Ask the backend for a guaranteed unique code
         const response = await socket.emitWithAck('create-room');
         navigate(`/home/${response.roomId}`);
     }
@@ -37,7 +37,7 @@ const LandingPage = () =>
      const handleJoinRoom = async () => {
         if(roomId.trim() === '') return;
 
-        // If they aren't logged in, route them straight to login!
+        // If the user isn't logged in, I create a guest session for them to easily join
         if (!user) 
         {
             const guestResult = await loginAsGuest();

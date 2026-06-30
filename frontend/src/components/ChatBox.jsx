@@ -1,12 +1,39 @@
 import { socket } from "../socket";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import './ChatBox.css';
 
+/**
+ * ChatBox Component
+ * 
+ * I built this component to handle real-time text communication between users in the same room.
+ * It manages the local input state, displays incoming messages and system alerts (like joins/leaves),
+ * and automatically scrolls to the newest message.
+ * 
+ * @param {string} roomId - The ID of the room the chat is bound to.
+ */
 const ChatBox = ({roomId}) => {
  
+    // State to hold the user's current typed message
     const [currentText, setCurrentText] = useState('');
+    
+    // State to store the array of all chat messages (both historical and live)
     const [messages, setMessages] = useState([]);
+    
+    // State to track how many people are currently in the room
     const [participants, setParticipants] = useState(1);
+    
+    // I use this ref to automatically scroll to the bottom of the chat list
+    const messagesEndRef = useRef(null);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    // Whenever a new message is added, trigger the scroll-to-bottom effect
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
 
     const handleInputChange = (e) => {
         setCurrentText(e.target.value);
@@ -15,19 +42,19 @@ const ChatBox = ({roomId}) => {
     const handleSendMessage = () => {
         if(currentText.trim() !== '')
         {
-            // Transmit message payload to the server
+            // I transmit the message payload to the server via Socket.io
             socket.emit('chat-message', {roomId, currentText});
             setCurrentText('');
         }
     }
 
      useEffect(() => {
-        // Listen for incoming live messages
+        // Listen for incoming live text messages from other users
         socket.on('new-messages', (incomingMessage) => {
             setMessages((prevMessages) => [...prevMessages, incomingMessage]);
         });
 
-        // Initialize state with room chat history on join
+        // Initialize state with the room's entire chat history upon joining
         socket.on('chat-history', (historyArray) => {
             setMessages(historyArray);
         });
@@ -47,16 +74,15 @@ const ChatBox = ({roomId}) => {
 
     return(
         <div className="chat-container">
-            <div className="chat-header" style={{ justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="chat-header">
+                <div className="chat-title-group">
                     <span>Room Chat</span>
-                    <span style={{ fontSize: '12px', background: 'var(--glass-border)', padding: '2px 8px', borderRadius: '12px' }}>
-                        {participants} <span style={{ color: 'var(--text-muted)' }}>👤</span>
+                    <span className="participant-count">
+                        {participants} <span className="participant-icon">👤</span>
                     </span>
                 </div>
                 <button 
-                    className="btn-secondary" 
-                    style={{ padding: '4px 12px', fontSize: '12px', width: 'auto' }}
+                    className="btn-secondary btn-copy-code"
                     onClick={() => {
                         navigator.clipboard.writeText(roomId);
                         alert("Room Code Copied: " + roomId);
@@ -90,6 +116,7 @@ const ChatBox = ({roomId}) => {
                     );
                 })
             }
+                <div ref={messagesEndRef} />
             </div>
             
             <div className="chatInput">

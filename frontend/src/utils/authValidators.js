@@ -1,7 +1,7 @@
 import z from 'zod';
 
 // --- VALIDATION LAYER ---
-// Strict rules for forms. We check these before hitting the backend
+// Strict rules for forms. I check these before hitting the backend
 // to save server resources and provide instant feedback to the user.
 
 export const registerUserSchema = z.object({

@@ -1,4 +1,5 @@
 import { io } from '../lib/socket.io.esm.min.js';
+import { CONFIG } from '../config.js';
 
 /*
  * SocketManager
@@ -26,7 +27,7 @@ export class SocketManager {
         this.disconnect();
 
         // Connect with JWT token (FORCE websocket because Service Workers don't support XHR polling!)
-        this.socket = io('http://localhost:8080', {
+        this.socket = io(CONFIG.BACKEND_URL, {
             auth: { token: token },
             transports: ['websocket']
         });

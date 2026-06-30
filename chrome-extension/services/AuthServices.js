@@ -1,3 +1,5 @@
+import { CONFIG } from "../config.js";
+
 /**
  * AuthService
  * 
@@ -7,7 +9,7 @@
  */
 export async function getGuestToken() {
     try {
-        const response = await fetch('http://localhost:8080/api/auth/guest');
+        const response = await fetch(`${CONFIG.BACKEND_URL}/api/auth/guest`);
         const data = await response.json();
         return data.token;
     } catch (error) {

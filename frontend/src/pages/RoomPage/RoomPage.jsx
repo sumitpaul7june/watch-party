@@ -7,16 +7,23 @@ import { socket } from '../../socket.js';
 import './RoomPage.css';
 import MediaSelector from '../../components/media/MediaSelector.jsx';
 
+/**
+ * RoomPage Component
+ * 
+ * I use this component as the primary view when a user is actively participating in a watch party.
+ * It manages the high-level state for the room (like the current media source) and renders the
+ * layout comprising the video player, chat box, and media selector.
+ */
 const RoomPage = () => {
 
-
+    // I track the currently playing media source (e.g., YouTube URL or Direct Link) here.
+    // This state is shared down to the VideoPlayer so it knows what to render.
     const[mediaSource, setMediaSource] = useState(null);
 
-    // Fetch room from the url params
+    // I fetch the roomId directly from the URL path so I know which room to join.
     const {roomId} = useParams();
-    console.log('fetched ', roomId);
 
-    // Join the socket to a specific room
+    // Custom hook I created to handle all the socket joining/leaving logic automatically on mount/unmount.
     useRoomManagement(roomId, socket);
 
     const handleMediaSelect = (source) =>
