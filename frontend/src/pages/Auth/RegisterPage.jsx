@@ -1,9 +1,8 @@
 import { useState, useContext } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router-dom";
 import { registerUserSchema } from "../../utils/authValidators";
 import { AuthContext } from "../../context/AuthContext.jsx";
-
-
+import "./Auth.css";
 
 export const RegisterPage = () => {
 
@@ -46,50 +45,79 @@ export const RegisterPage = () => {
             navigate("/");
         }
 
-
         setErrorMessage("");
     }
 
-    
-
     return(
-        <div>
-            <h2>Sign Up for Watch Party</h2>
-            <form onSubmit={handleSubmit}>
-                <div style={{ marginBottom: "10px" }}>
-                    Name: 
-                    <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
-                </div>
+        <div className="auth-page-container">
+            <div className="auth-card">
+                <h2 className="auth-title">Create Account</h2>
                 
-                <div style={{ marginBottom: "10px" }}>
-                    Username: 
-                    <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+                {errorMessage && <div className="error-message">{errorMessage}</div>}
+
+                <form className="auth-form" onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label className="form-label">Full Name</label>
+                        <input 
+                            type="text" 
+                            placeholder="John Doe"
+                            value={name} 
+                            onChange={(e) => setName(e.target.value)} 
+                        />
+                    </div>
+                    
+                    <div className="form-group">
+                        <label className="form-label">Username</label>
+                        <input 
+                            type="text" 
+                            placeholder="johndoe123"
+                            value={username} 
+                            onChange={(e) => setUsername(e.target.value)} 
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Email</label>
+                        <input 
+                            type="email" 
+                            placeholder="john@example.com"
+                            value={email} 
+                            onChange={(e) => setEmail(e.target.value)} 
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Password</label>
+                        <input 
+                            type="password" 
+                            placeholder="Create a strong password"
+                            value={password} 
+                            onChange={(e) => setPassword(e.target.value)} 
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Confirm Password</label>
+                        <input 
+                            type="password" 
+                            placeholder="Repeat your password"
+                            value={confirmPassword} 
+                            onChange={(e) => setConfirmPassword(e.target.value)} 
+                        />
+                    </div>
+
+                    <button type="submit" className="btn-primary" style={{marginTop: '8px'}}>Sign Up</button>
+                </form>
+
+                <div className="auth-footer">
+                    Already have an account? <Link to="/login" className="auth-link">Log In</Link>
+                    <div style={{ marginTop: '12px' }}>
+                        <Link to="/" className="auth-link" style={{ color: 'var(--text-muted)' }}>
+                            Continue as Guest
+                        </Link>
+                    </div>
                 </div>
-
-                <div style={{ marginBottom: "10px" }}>
-                    Email: 
-                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                </div>
-
-                <div style={{ marginBottom: "10px" }}>
-                    Password: 
-                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                </div>
-
-                <div style={{ marginBottom: "15px" }}>
-                    Confirm Password: 
-                    <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
-                </div>
-
-                
-                <span style={{ color: "red", display: "block", fontSize: "12px", marginBottom: "10px" }}>
-                    {errorMessage}
-                </span>
-
-                <button type="submit">Sign Up</button>
-            </form>
-
+            </div>
         </div>
-
     );
 }

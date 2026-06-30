@@ -8,9 +8,9 @@ const roomHandler = (socket) => {
     socket.on('create-room', (callback) => {
         let newRoomId;
 
-        // Generate a 6-character code and ensure it is unique
+        // Generate a 7-character code and ensure it is unique
         do {
-            newRoomId = Math.random().toString(36).substring(2, 8);
+            newRoomId = Math.random().toString(36).substring(2, 9);
         }
         while (roomStore.getRoom(newRoomId));
 

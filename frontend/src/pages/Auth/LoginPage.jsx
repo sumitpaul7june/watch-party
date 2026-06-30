@@ -1,8 +1,8 @@
 import { useState, useContext } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router-dom";
 import { loginUserSchema } from "../../utils/authValidators.js";
 import { AuthContext } from "../../context/AuthContext.jsx";
-
+import "./Auth.css";
 
 export const LoginPage = () => {
     
@@ -41,39 +41,53 @@ export const LoginPage = () => {
         {
             console.log("Successfully logged in");
             navigate("/");
-            
         }
 
         setErrorMessage("");
-        
-        
     }
 
     return(
-        <div>
-            <h2>Login to Watch Party</h2>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    Username: 
-                    <input 
-                        type="text" 
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                    />
-                </div>
-                <div>
-                    Password: 
-                    <input 
-                        type="password" 
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                </div>
-                <span style={{ color: "red", fontSize: "12px" }}>{errorMessage}</span>
-                <button type="submit">Submit</button>
+        <div className="auth-page-container">
+            <div className="auth-card">
+                <h2 className="auth-title">Welcome Back</h2>
+                
+                {errorMessage && <div className="error-message">{errorMessage}</div>}
 
-            </form>
+                <form className="auth-form" onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label className="form-label">Username</label>
+                        <input 
+                            type="text" 
+                            placeholder="Enter your username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                        />
+                    </div>
+                    
+                    <div className="form-group">
+                        <label className="form-label">Password</label>
+                        <input 
+                            type="password" 
+                            placeholder="Enter your password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                    </div>
+                    
+                    <button type="submit" className="btn-primary" style={{marginTop: '8px'}}>
+                        Log In
+                    </button>
+                </form>
+
+                <div className="auth-footer">
+                    Don't have an account? <Link to="/register" className="auth-link">Sign up</Link>
+                    <div style={{ marginTop: '12px' }}>
+                        <Link to="/" className="auth-link" style={{ color: 'var(--text-muted)' }}>
+                            Continue as Guest
+                        </Link>
+                    </div>
+                </div>
+            </div>
         </div>
-        
     );
 }

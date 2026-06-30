@@ -1,12 +1,13 @@
 import YouTube from "react-youtube";
 import { useYoutubeSync } from "./youtube/useYoutubeSync.js";
+import "./YoutubePlayer.css";
 
 const YoutubePlayer = ({ socket, roomId, mediaSource }) => {
     const { onPlayerReady, handleStateChange } = useYoutubeSync(socket, roomId);
 
     const opts = {
-        height: "500",
-        width: "800",
+        height: "100%",
+        width: "100%",
         playerVars: {
             controls: 1,
             rel: 0,
@@ -20,6 +21,8 @@ const YoutubePlayer = ({ socket, roomId, mediaSource }) => {
             opts={opts}
             onStateChange={handleStateChange}
             onReady={onPlayerReady}
+            className="youtube-container"
+            iframeClassName="youtube-iframe"
         />
     );
 };

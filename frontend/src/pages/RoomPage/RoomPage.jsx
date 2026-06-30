@@ -29,6 +29,9 @@ const RoomPage = () => {
     }
 
     useEffect(() => {
+        // Save the room ID to local storage so I can easily rejoin it
+        localStorage.setItem('watchPartyLastRoom', roomId);
+
         const handleMediaSource = (source) => {
             setMediaSource(source);
         };
@@ -38,22 +41,26 @@ const RoomPage = () => {
         return () => {
             socket.off("media-source", handleMediaSource);
         }
-    }, []);
+    }, [roomId]);
 
 
     return (
-        <div className="room-container">
-            <div className="media-container">
-                <MediaSelector onMediaSelect={handleMediaSelect}/>
+        <div className="room-page-layout">
+            <div className="main-content-area">
+                <div className="media-control-panel">
+                    <MediaSelector onMediaSelect={handleMediaSelect}/>
+                </div>
+
+                <div className="video-container">
+                    <VideoPlayer
+                        socket={socket}
+                        roomId={roomId}
+                        mediaSource={mediaSource}
+                    />
+                </div>
             </div>
 
-            <VideoPlayer
-                socket={socket}
-                roomId={roomId}
-                mediaSource = {mediaSource}
-            />
-
-            <div className="chat-section">
+            <div className="side-panel">
                 <ChatBox roomId={roomId} />
             </div>
         </div>

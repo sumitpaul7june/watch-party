@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { extractYouTubeVideoId } from "../../utils/youtube";
+import "./MediaSelector.css";
 
 const MediaSelector = ({onMediaSelect}) => {
 
@@ -33,27 +34,34 @@ const MediaSelector = ({onMediaSelect}) => {
                 url
             });
         }
-
-
     }
+
     return(
-        <div>
-            <div>
-                <button onClick={() => setMediaType("youtube")} >Youtube</button>
-            </div>
-            <div>
-               <button onClick={() => setMediaType("direct")}>Custom Video Link</button>
+        <div className="media-selector-container">
+            <div className="media-type-toggles">
+                <button 
+                    className={`toggle-btn ${mediaType === "youtube" ? "active" : ""}`}
+                    onClick={() => setMediaType("youtube")} 
+                >
+                    YouTube
+                </button>
+                <button 
+                    className={`toggle-btn ${mediaType === "direct" ? "active" : ""}`}
+                    onClick={() => setMediaType("direct")}
+                >
+                    Direct Link
+                </button>
             </div>
 
-            <input type="text"
-                placeholder= {
-                    mediaType === "youtube" ? "Enter Youtube link" : "Enter direct video link"
-                }
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-            />
-
-            <button onClick={handleSubmit}>Load Media</button>
+            <div className="media-input-wrapper">
+                <input 
+                    type="text"
+                    placeholder={mediaType === "youtube" ? "Paste YouTube link here..." : "Paste direct video URL (.mp4, .webm)..."}
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                />
+                <button className="btn-load" onClick={handleSubmit}>Load Media</button>
+            </div>
         </div>
     );
 }
