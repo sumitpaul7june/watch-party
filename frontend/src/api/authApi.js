@@ -12,7 +12,7 @@ axios.interceptors.request.use((req) => {
 const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080';
 
 // --- API LAYER ---
-// I keep all backend HTTP requests here to ensure my React components stay clean and focused only on UI.
+// Centralizes all backend HTTP requests here to ensure React components stay clean and focused solely on UI.
 
 /**
  * Authenticates a user and retrieves a JWT token.

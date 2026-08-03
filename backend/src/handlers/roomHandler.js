@@ -1,72 +1,74 @@
 import { roomStore } from '../store/roomStore.js';
 
 // --- ROOM EVENT HANDLERS ---
-// This file manages all socket events related to joining, leaving, and creating rooms.
+// Manages the complete lifecycle of a Watch Party room, including creation,
+// joining, leaving, and pre-flight validation checks.
 const roomHandler = (socket) => {
 
-    // 1. Create a brand new room
+    // 1. Create a New Room
+    // Triggered when a host clicks "Create Room" on the frontend.
+    // Uses a callback to instantly return the newly generated room code to the specific user who requested it.
     socket.on('create-room', (callback) => {
         let newRoomId;
 
-        // Generate a 7-character code and ensure it is unique
+        // Generate a 7-character alphanumeric code. 
+        // The loop ensures we never accidentally generate a room ID that is already in use.
         do {
             newRoomId = Math.random().toString(36).substring(2, 9);
-        }
-        while (roomStore.getRoom(newRoomId));
+        } while (roomStore.getRoom(newRoomId));
 
-        // Physically create the room in memory so it exists before anyone joins.
-        // This ensures the room state (chat history, media source, user map) is initialized.
+        // Initialize the empty room in our in-memory store so it is ready to accept users.
         roomStore.createRoom(newRoomId);
 
+        // Execute the callback function provided by the frontend, sending back the new ID.
         callback({ roomId: newRoomId });
-    })
+    });
 
-    // 2. Handle users trying to join an existing room
+    // 2. Join an Existing Room
+    // Triggered when a user attempts to enter a room via the RoomPage component.
     socket.on('join-room', (roomId) => {
         if (!roomId) return;
 
-        // Prevent joining if the user is already in the room
-        if (roomStore.isUserInRoom(roomId, socket.id)) {
-            return;
-        }
+        // Prevent a user who is already in the room from triggering the join logic twice.
+        if (roomStore.isUserInRoom(roomId, socket.id)) return;
 
-        // Pre-flight check: Is the room full? Reject the request if capacity is reached.
+        // Enforce the 10-person capacity limit. 
+        // If full, notify this specific socket to redirect to the home page.
         if (roomStore.isRoomFull(roomId)) {
-            console.log('Room capacity exceeded, rejecting join request');
             socket.emit('full-room-error', roomId);
             return;
         }
 
-        // Attempt to join the room in the store. 
-        // Pass socket.user from JWT to store the user's identity (username, guest status) along with their socket ID.
+        // Register the user in the in-memory Room Store. 
+        // We pass the decoded JWT user data (socket.user) to attach their identity to this session.
         const room = roomStore.joinRoom(roomId, socket.id, socket.user);
-        
-        // If joinRoom returns null, the room code doesn't exist!
+
+        // If the store returns null, the room code does not exist.
         if (!room) {
             socket.emit('invalid-room-error');
             return;
         }
 
-        // Add the socket to the socket.io room channel
+        // Native Socket.IO command: Subscribe this connection to the room's broadcast channel.
         socket.join(roomId);
         console.log(`User ${socket.id} joined room ${roomId}`);
 
-        // Broadcast the new participant count to everyone in the room, including the newly joined user
+        // Broadcast the updated participant count to everyone in the room (including the new user).
         const currentCount = room.users.size;
         socket.to(roomId).emit('room-update', { count: currentCount });
         socket.emit('room-update', { count: currentCount });
 
-        // Sync current video state to the newly joined user
+        // Synchronize the new user's video player with what the room is currently watching.
         if (room.mediaSource) {
             socket.emit('media-source', room.mediaSource);
         }
 
-        // Sync chat history to the newly joined user
+        // Send the recent chat history to the new user so they aren't looking at an empty chat box.
         if (room.chatHistory && room.chatHistory.length > 0) {
             socket.emit('chat-history', room.chatHistory);
         }
 
-        // Send a system message to everyone indicating that the user joined
+        // Announce the arrival of the new user to everyone in the chat box via a system message.
         const joinMessage = {
             text: 'joined the room',
             senderId: socket.id,
@@ -75,24 +77,27 @@ const roomHandler = (socket) => {
         };
         roomStore.addChatMessage(roomId, joinMessage);
         socket.to(roomId).emit('new-messages', joinMessage);
-        socket.emit('new-messages', joinMessage); // Also show it to the user who just joined
+        socket.emit('new-messages', joinMessage);
     });
 
-    // 3. Handle users explicitly leaving a room
+    // 3. Leave a Room
+    // Triggered when a user explicitly clicks a "Leave" button or navigates away.
     socket.on('leave-room', (roomId) => {
         if (!roomId) return;
 
-        // Remove the socket from the socket.io room channel and the in-memory store
+        // Native Socket.IO command: Unsubscribe from the room's broadcast channel.
         socket.leave(roomId);
+
+        // Remove the user from the in-memory store.
         roomStore.leaveRoom(roomId, socket.id);
         console.log(`User ${socket.id} left room ${roomId}`);
 
-        // Notify remaining participants about the new user count
+        // Calculate the new participant count and broadcast it to the remaining users.
         const roomAfterLeave = roomStore.getRoom(roomId);
         const newCount = roomAfterLeave ? roomAfterLeave.users.size : 0;
         socket.to(roomId).emit('room-update', { count: newCount });
 
-        // Send a system message to remaining participants indicating that the user left
+        // Announce the departure of the user to the remaining participants.
         const leaveMessage = {
             text: 'left the room',
             senderId: socket.id,
@@ -103,7 +108,9 @@ const roomHandler = (socket) => {
         socket.to(roomId).emit('new-messages', leaveMessage);
     });
 
-    // 4. Handle pre-flight check from Landing Page (checking if a room is valid before navigating)
+    // 4. Pre-flight Room Validation
+    // Triggered by the Landing Page before the frontend changes the URL.
+    // Uses a callback to instantly answer: "Is it safe to navigate to this room?"
     socket.on('check-room', (roomId, callback) => {
         if (!roomStore.getRoom(roomId)) {
             callback({ status: 'invalid' });
@@ -114,6 +121,6 @@ const roomHandler = (socket) => {
         }
     });
 
-}
+};
 
 export default roomHandler;

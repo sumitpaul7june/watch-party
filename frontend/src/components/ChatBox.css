@@ -131,6 +131,11 @@
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
 
+.system-row .text-message {
+  font-style: italic;
+  opacity: 0.8;
+}
+
 .chatInput {
   padding: 16px 20px;
   border-top: 1px solid var(--glass-border);

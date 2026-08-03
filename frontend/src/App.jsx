@@ -5,7 +5,7 @@ import ErrorPage from "./pages/ErrorPage/ErrorPage";
 import LandingPage from "./pages/LandingPage/LandingPage";
 import { LoginPage } from "./pages/Auth/LoginPage";
 import { RegisterPage } from "./pages/Auth/RegisterPage";
-import { ProtectedRoute } from "./components/ProtectedRoute";
+
 function App()
 {
   const router = createBrowserRouter([

@@ -10,22 +10,22 @@ import MediaSelector from '../../components/media/MediaSelector.jsx';
 /**
  * RoomPage Component
  * 
- * I use this component as the primary view when a user is actively participating in a watch party.
- * It manages the high-level state for the room (like the current media source) and renders the
- * layout comprising the video player, chat box, and media selector.
+ * This is the main screen users see when they join a watch party.
+ * It holds the video player on the left and the chat box on the right.
  */
 const RoomPage = () => {
 
-    // I track the currently playing media source (e.g., YouTube URL or Direct Link) here.
-    // This state is shared down to the VideoPlayer so it knows what to render.
+    // Keeps track of what video is currently playing (like a YouTube link)
     const[mediaSource, setMediaSource] = useState(null);
 
-    // I fetch the roomId directly from the URL path so I know which room to join.
+    // Gets the room code from the website URL (e.g., /home/1234 -> gets '1234')
     const {roomId} = useParams();
 
-    // Custom hook I created to handle all the socket joining/leaving logic automatically on mount/unmount.
+    // A helper that automatically connects the user to the room when they open the page
+    // and disconnects them when they leave
     useRoomManagement(roomId, socket);
 
+    // When the user picks a new video, update our screen and tell everyone else in the room
     const handleMediaSelect = (source) =>
     {
         setMediaSource(source);
@@ -36,18 +36,17 @@ const RoomPage = () => {
     }
 
     useEffect(() => {
-        // Save the room ID to local storage so I can easily rejoin it
+        // Remember this room code so the user can easily click "Rejoin" on the home page later
         localStorage.setItem('watchPartyLastRoom', roomId);
 
-        const handleMediaSource = (source) => {
-            setMediaSource(source);
-        };
+        // This function updates the video when someone else changes it
+        const updateVideo = (source) => setMediaSource(source);
 
-        socket.on("media-source", handleMediaSource);
+        // Start listening for video changes from the server
+        socket.on("media-source", updateVideo);
 
-        return () => {
-            socket.off("media-source", handleMediaSource);
-        }
+        // Cleanup: Stop listening when the user leaves the page
+        return () => socket.off("media-source", updateVideo);
     }, [roomId]);
 
 

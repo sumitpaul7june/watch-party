@@ -1,79 +1,90 @@
 import { getGuestToken } from '../services/AuthServices.js';
 
 /*
- * Message Router
+ * ==========================================
+ * MESSAGE ROUTER (The "Switchboard" Pattern)
+ * ==========================================
  * 
- * Why we made this: Chrome extensions have many moving parts (popups, sidebars, background scripts).
- * This class acts as the "Traffic Cop" or "Switchboard" for our background service worker. 
- * Instead of stuffing all our logic into one massive listener, this class listens to incoming 
- * messages and routes them to small, specific handler functions (or to the SocketManager).
+ * DESIGN PATTERN: Router / Switchboard Pattern
+ * Purpose: Chrome extensions have many moving parts (Popup, Sidebar, Background, Content Scripts).
+ * If all the logic was stuffed into one massive `chrome.runtime.onMessage` listener, the file would be 
+ * 1,000 lines long and impossible to read (often called "Spaghetti Code").
+ * 
+ * Instead, this class acts as a Traffic Cop. It has ONE job:
+ * 1. Catch every incoming message.
+ * 2. Look at the `action` string (e.g., "CREATE_ROOM").
+ * 3. Route the data to a tiny, specific helper function to do the actual work.
  */
 export class MessageRouter {
     constructor(socketManager) {
-        // Pass the socket manager in to connect when asked
+        // DEPENDENCY INJECTION: The SocketManager is passed in so the Router can use it!
         this.socketManager = socketManager;
         this.setupListeners();
     }
 
+    /**
+     * Registers the global listeners that wait for Chrome events.
+     */
     setupListeners() {
+        // 1. TAB CLOSING LISTENER (Cleanup Crew)
         // Detect if the user simply closed their Netflix tab, and auto-disconnect the socket
         chrome.tabs.onRemoved.addListener((tabId) => {
             if (this.socketManager.tabId === tabId) {
                 console.log("MessageRouter: Netflix tab was closed! Auto-disconnecting socket.");
-                this.handleDisconnect(tabId, () => {});
+                // An empty callback () => {} is passed because there is no Popup waiting for a response!
+                this.handleDisconnect(tabId, () => { });
             }
         });
 
-        // The one global listener for the entire extension.
+        // 2. THE GLOBAL MESSAGE LISTENER (The Switchboard)
         // It catches every message sent by chrome.runtime.sendMessage and decides where it goes.
         chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
             switch (message.action) {
-                // When the user clicks "Create Room" in the popup
                 case "CREATE_ROOM":
+                    // Popup asked to create a room.
                     this.handleCreateRoom(message.tabId, sendResponse);
-                    return true;
+                    return true; // Returns true to tell Chrome: "Keep the sendResponse connection open for async work!"
 
-                // When the user clicks "Join" in the popup or auto-joins via URL
                 case "JOIN_ROOM":
-                    // We use sender.tab.id as fallback — this covers auto-join from the content script
+                    // Popup asked to join a room.
                     const joinTabId = message.tabId || (sender.tab ? sender.tab.id : null);
                     this.handleJoinRoom(message.roomId, joinTabId, sendResponse);
-                    return true; // Keeps the sendResponse channel open asynchronously
+                    return true;
 
-                // When the user plays/pauses/seeks the video
                 case "VIDEO_COMMAND":
+                    // Content script sent a video play/pause event.
                     this.handleVideoCommand(message.payload);
-                    break;
+                    break; // No sendResponse needed here, so it just breaks.
 
-                // When the popup asks what room we are currently in
                 case "GET_STATE":
+                    // Popup opened and wants to know if the user is already in a room.
                     this.handleGetState(sendResponse);
                     return true;
 
-                // When the user clicks the disconnect button
                 case "DISCONNECT":
+                    // User clicked "Leave Room" in the Popup.
                     this.handleDisconnect(message.tabId, sendResponse);
                     return true;
 
-                // When the user clicks toggle chat in the popup
                 case "TOGGLE_CHAT":
+                    // User clicked the eye icon to hide/show the chat sidebar.
                     this.handleToggleChat(message.tabId, sendResponse);
                     return true;
 
-                // When a user refreshes the Netflix tab, it asks if it was in a room
                 case "RECONNECT_TAB":
+                    // User refreshed the Netflix page, the sidebar needs to be re-injected!
                     const reconnectTabId = sender.tab ? sender.tab.id : null;
                     this.handleReconnectTab(reconnectTabId, sendResponse);
                     return true;
 
-                // When the Sidebar opens and asks for the chat history
                 case "GET_CHAT_HISTORY":
+                    // Sidebar UI just loaded and needs all the old chat messages.
                     this.handleGetChatHistory(sendResponse);
                     return true;
 
-                // When the Sidebar sends a message
                 case "SEND_CHAT_MESSAGE":
+                    // Sidebar UI sent a new chat message to broadcast.
                     console.log("MessageRouter: Received message from Sidebar. Passing to SocketManager.");
                     this.socketManager.sendChatMessage(message.text);
                     break;
@@ -81,9 +92,15 @@ export class MessageRouter {
         });
     }
 
-    // --- HANDLER FUNCTIONS ---
-    // By breaking these out into small functions, we keep the main listener clean and easy to read.
+    // ==========================================
+    // HANDLER FUNCTIONS
+    // ==========================================
+    // By breaking these out into small functions, the main listener is kept clean and modular.
 
+    /**
+     * Handles creating a new room. 
+     * Talks to SocketManager, then dynamically injects the Sidebar into Netflix!
+     */
     async handleCreateRoom(tabId, sendResponse) {
         console.log("MessageRouter: Routing CREATE_ROOM request");
 
@@ -94,78 +111,88 @@ export class MessageRouter {
         }
 
         try {
+            // Wait for SocketManager to create the room...
             const result = await this.socketManager.createRoom(token, tabId);
 
-            // Inject the sidebar into the active tab
+            // Room created successfully! Now, inject the Sidebar HTML/JS into the Netflix Tab.
             if (tabId) {
+                // Try sending a message to see if the script is already there
                 chrome.tabs.sendMessage(tabId, { action: "INJECT_SIDEBAR" })
                     .catch(err => {
-                        console.log("MessageRouter: Content script not found, injecting dynamically...", err);
+                        // If it fails, the script isn't there! Dynamically inject it using Chrome Scripting API.
+                        console.log("MessageRouter: Content script not found, injecting dynamically...");
                         chrome.scripting.executeScript({
                             target: { tabId: tabId },
                             files: ['content.js']
                         }).then(() => {
-                            chrome.tabs.sendMessage(tabId, { action: "INJECT_SIDEBAR" }).catch(() => {});
-                        }).catch(e => console.error("MessageRouter: Dynamic injection failed.", e));
+                            // After injection, tell it to open the sidebar.
+                            chrome.tabs.sendMessage(tabId, { action: "INJECT_SIDEBAR" }).catch(() => { });
+                        });
                     });
             }
 
+            // Replies to the Popup indicating success!
             sendResponse({ success: true, roomId: result.roomId });
         } catch (err) {
+            // Replies to the Popup indicating failure.
             sendResponse({ success: false, error: err.error || "Failed to create room." });
         }
     }
 
+    /**
+     * Handles joining an existing room.
+     */
     async handleJoinRoom(roomId, tabId, sendResponse) {
         console.log(`MessageRouter: Routing JOIN_ROOM request for room ${roomId}`);
 
-        // 1. Get the auth token from the backend
         const token = await getGuestToken();
-
         if (!token) {
             sendResponse({ success: false, error: "Failed to get auth token." });
             return;
         }
 
         try {
-            // 2. Instruct the SocketManager to connect (pass tabId so it knows where to forward commands)
-            await this.socketManager.connect(roomId, token, tabId);
+            // Ask SocketManager to join the room...
+            await this.socketManager.joinRoom(roomId, token, tabId);
 
-            // 3. Inject the sidebar directly into the tab the user was looking at!
+            // Successfully joined! Inject the sidebar.
             if (tabId) {
-                console.log(`MessageRouter: Injecting into exact tab ID: ${tabId}`);
                 chrome.tabs.sendMessage(tabId, { action: "INJECT_SIDEBAR" })
                     .catch(err => {
-                        console.log("MessageRouter: Content script not found, injecting dynamically...", err);
                         chrome.scripting.executeScript({
                             target: { tabId: tabId },
                             files: ['content.js']
                         }).then(() => {
-                            chrome.tabs.sendMessage(tabId, { action: "INJECT_SIDEBAR" }).catch(() => {});
-                        }).catch(e => console.error("MessageRouter: Dynamic injection failed.", e));
+                            chrome.tabs.sendMessage(tabId, { action: "INJECT_SIDEBAR" }).catch(() => { });
+                        });
                     });
-            } else {
-                console.warn("MessageRouter: No tabId provided to inject sidebar into!");
             }
 
-            // 4. Tell the popup it succeeded
             sendResponse({ success: true });
         } catch (err) {
-            // The Promise rejected — room doesn't exist or is full
             sendResponse({ success: false, error: err.error || "Failed to join room." });
         }
     }
 
+    /**
+     * Forwards a video play/pause command directly to the SocketManager.
+     */
     handleVideoCommand(payload) {
         console.log("MessageRouter: Routing VIDEO_COMMAND to backend:", payload);
         this.socketManager.sendVideoCommand(payload);
     }
 
+    /**
+     * When the Popup opens, it calls this to check if the user is already in a room.
+     */
     handleGetState(sendResponse) {
         console.log("MessageRouter: Routing GET_STATE request");
         sendResponse({ roomId: this.socketManager.getRoomId() });
     }
 
+    /**
+     * Sends the entire chat history array to the Sidebar so it can render old messages.
+     */
     handleGetChatHistory(sendResponse) {
         console.log("MessageRouter: Sending chat history to sidebar");
         sendResponse({
@@ -176,34 +203,46 @@ export class MessageRouter {
         });
     }
 
+    /**
+     * Handles leaving a room. Kills the socket and tells Netflix to delete the Sidebar.
+     */
     handleDisconnect(tabId, sendResponse) {
         console.log("MessageRouter: Routing DISCONNECT request");
-        
+
+        // Use the provided tabId, or fallback to the one saved in SocketManager.
         const targetTabId = tabId || this.socketManager.tabId;
 
         // 1. Kill the WebSocket connection
         this.socketManager.disconnect();
-        
-        // 2. Tell the specific Netflix tab to destroy the sidebar UI and stop listening
+
+        // 2. Tell the specific Netflix tab to destroy the sidebar UI
         if (targetTabId) {
-            chrome.tabs.sendMessage(targetTabId, { action: "TEARDOWN" }).catch(() => {});
+            chrome.tabs.sendMessage(targetTabId, { action: "TEARDOWN" }).catch(() => { });
         }
 
+        // 3. Reply to the caller (if a callback was provided)
         if (sendResponse) sendResponse({ success: true });
     }
 
+    /**
+     * Tells the Netflix tab to temporarily hide/show the Sidebar without disconnecting.
+     */
     handleToggleChat(tabId, sendResponse) {
         const targetTabId = tabId || this.socketManager.tabId;
         if (targetTabId) {
-            chrome.tabs.sendMessage(targetTabId, { action: "TOGGLE_CHAT" }).catch(() => {});
+            chrome.tabs.sendMessage(targetTabId, { action: "TOGGLE_CHAT" }).catch(() => { });
         }
         sendResponse({ success: true });
     }
 
+    /**
+     * If the user presses F5 to refresh Netflix, Chrome deletes the Sidebar.
+     * This function catches the page reload and instantly re-injects the Sidebar!
+     */
     handleReconnectTab(tabId, sendResponse) {
         if (tabId && this.socketManager.roomId) {
             this.socketManager.tabId = tabId;
-            chrome.tabs.sendMessage(tabId, { action: "INJECT_SIDEBAR" }).catch(() => {});
+            chrome.tabs.sendMessage(tabId, { action: "INJECT_SIDEBAR" }).catch(() => { });
         }
         if (sendResponse) sendResponse({ success: true });
     }

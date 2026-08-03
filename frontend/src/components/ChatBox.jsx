@@ -5,9 +5,9 @@ import './ChatBox.css';
 /**
  * ChatBox Component
  * 
- * I built this component to handle real-time text communication between users in the same room.
- * It manages the local input state, displays incoming messages and system alerts (like joins/leaves),
- * and automatically scrolls to the newest message.
+ * Handles real-time text communication between users in the same room.
+ * It manages the local input state, displays incoming messages and system alerts 
+ * (like joins/leaves), and automatically scrolls to the newest message.
  * 
  * @param {string} roomId - The ID of the room the chat is bound to.
  */
@@ -22,7 +22,7 @@ const ChatBox = ({roomId}) => {
     // State to track how many people are currently in the room
     const [participants, setParticipants] = useState(1);
     
-    // I use this ref to automatically scroll to the bottom of the chat list
+    // Uses a ref to automatically scroll to the bottom of the chat list
     const messagesEndRef = useRef(null);
 
     const scrollToBottom = () => {
@@ -35,6 +35,12 @@ const ChatBox = ({roomId}) => {
     }, [messages]);
 
 
+    // Copies the room code to the user's clipboard and shows an alert
+    const handleCopyRoomCode = () => {
+        navigator.clipboard.writeText(roomId);
+        alert("Room Code Copied: " + roomId);
+    };
+
     const handleInputChange = (e) => {
         setCurrentText(e.target.value);
     }
@@ -42,7 +48,7 @@ const ChatBox = ({roomId}) => {
     const handleSendMessage = () => {
         if(currentText.trim() !== '')
         {
-            // I transmit the message payload to the server via Socket.io
+            // Transmits the message payload to the server via Socket.io
             socket.emit('chat-message', {roomId, currentText});
             setCurrentText('');
         }
@@ -83,10 +89,7 @@ const ChatBox = ({roomId}) => {
                 </div>
                 <button 
                     className="btn-secondary btn-copy-code"
-                    onClick={() => {
-                        navigator.clipboard.writeText(roomId);
-                        alert("Room Code Copied: " + roomId);
-                    }}
+                    onClick={handleCopyRoomCode}
                     title="Click to copy Room Code"
                 >
                     Copy Code: {roomId}
@@ -100,7 +103,7 @@ const ChatBox = ({roomId}) => {
                             <img src={`https://api.dicebear.com/9.x/bottts/svg?seed=${msg.senderId}`} className="profile-img" alt="" />
                             <div className="message-bubble">
                                 <span className="sender-name">{msg.senderName || 'Anonymous'}</span>
-                                <div className="text-message" style={msg.type === 'system' ? { fontStyle: 'italic', opacity: 0.8 } : {}}>{msg.text}</div>
+                                <div className="text-message">{msg.text}</div>
                             </div>
                         </div>
                     );

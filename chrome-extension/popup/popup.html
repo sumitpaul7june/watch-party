@@ -3,37 +3,43 @@
 
 <head>
     <link rel="stylesheet" href="popup.css">
-
 </head>
 
 <body>
     <h1>FluxParty</h1>
 
-    <!-- View 1: When you are NOT in a party -->
+    <!-- VIEW 1: Logged Out State (Not in a room) -->
     <div id="join-view">
         <button id="create-btn">Create Room</button>
         <div class="flex-row join-input-row">
             <input type="text" id="room-input" placeholder="Enter Room ID" />
             <button id="join-btn">Join</button>
         </div>
+        <!-- Displays connection errors -->
         <p id="status"></p>
     </div>
 
-    <!-- View 2: When you ARE in a party -->
+    <!-- VIEW 2: Logged In State (Connected to a room) -->
     <div id="management-view">
         <h2>Party Management</h2>
         <p class="connected-label">You are connected to:</p>
+        
+        <!-- Active Room ID is injected here by popup.js -->
         <p class="room-id-container"><strong id="current-room-id">...</strong></p>
 
+        <!-- Copies invite link to clipboard -->
         <button id="copy-link-btn" class="secondary-btn">Copy Room Code</button>
         <p id="copy-status"></p>
         
         <div class="flex-row">
+            <!-- Shows/hides the chat sidebar -->
             <button id="toggle-chat-btn" class="secondary-btn">Toggle Chat</button>
+            <!-- Leaves the room and disconnects -->
             <button id="disconnect-btn" class="danger-btn">Disconnect</button>
         </div>
     </div>
 
+    <!-- Initializes UI and binds button click events -->
     <script src="popup.js"></script>
 </body>
 

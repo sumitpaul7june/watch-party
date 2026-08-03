@@ -5,22 +5,25 @@ import "./MediaSelector.css";
 /**
  * MediaSelector Component
  * 
- * I created this component to allow users to switch between different media types
- * (e.g., YouTube videos vs. direct .mp4 links) and to input the URL they want to watch.
- * Once a valid URL is submitted, it passes the media payload up to the parent RoomPage.
+ * Allows users to switch between different media types (e.g., YouTube videos vs. 
+ * direct .mp4 links) and input the URL they want to watch. Once a valid URL is 
+ * submitted, it passes the media data up to the parent RoomPage.
  * 
  * @param {function} onMediaSelect - Callback fired when a valid media URL is submitted.
  */
 const MediaSelector = ({onMediaSelect}) => {
 
-    // I track which type of media the user intends to play (currently 'youtube' or 'direct').
+    // Tracks which type of media the user intends to play (currently 'youtube' or 'direct').
     const [mediaType, setMediaType] = useState("youtube");
     
-    // I track the raw URL input string before it gets parsed or validated.
+    // Tracks the raw URL input string before it gets parsed or validated.
     const [url, setUrl] = useState("");
 
     const handleSubmit = () => {
-        if(!url.trim()) return;
+        if(!url.trim()) {
+            alert("Please enter a media URL before loading.");
+            return;
+        }
 
         if(mediaType === "youtube")
         {

@@ -4,3 +4,6 @@ node_modules/
 dist/
 build/
 *.zip
+
+# Ignore AI-generated architectural files
+*_diagrams.md

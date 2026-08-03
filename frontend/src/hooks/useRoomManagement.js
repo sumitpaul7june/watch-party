@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
 // --- ROOM MANAGEMENT HOOK ---
-// I built this custom hook to handle the complex lifecycle of joining and leaving rooms via WebSockets.
+// A custom hook designed to handle the complex lifecycle of joining and leaving rooms via WebSockets.
 export const useRoomManagement = (roomId, socket) => {
     const navigate = useNavigate();
 
@@ -14,13 +14,13 @@ export const useRoomManagement = (roomId, socket) => {
         // Handle the case where the room is completely full
         const handleFullRoomError = (fullRoomId) => {
             alert(`This room is full (${fullRoomId}). Please try joining another room.`);
-            navigate('/'); // Bounce them back to the landing page!
+            navigate('/'); // Redirect to the landing page
         };
 
-        // Handle the case where someone typed a fake room code in the URL
+        // Handle the case where an invalid or non-existent room code is provided
         const handleInvalidRoomError = () => {
             alert(`This room code does not exist!`);
-            navigate('/'); // Bounce them back to the landing page!
+            navigate('/'); // Redirect to the landing page
         }
 
         socket.on('full-room-error', handleFullRoomError);

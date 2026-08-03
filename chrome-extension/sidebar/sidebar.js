@@ -22,23 +22,42 @@ class SidebarUI {
     }
 
     setRoomId(roomId) {
+        // 1. Update the button text to show the Room ID immediately.
         this.roomBadge.innerText = `Copy Code: ${roomId}`;
+        
+        // 2. Attach a click listener to the button so the user can copy the invite link.
         this.roomBadge.onclick = () => {
-            // Get the Netflix URL passed from content.js
+            // --- URL PARSING LOGIC ---
+            // Grab the query string from the iframe's URL (e.g., "?url=https%3A%2F%2F...")
             const urlParams = new URLSearchParams(window.location.search);
+            // Extract and decode the original Netflix URL
             const netflixUrlStr = urlParams.get('url');
             
-            let textToCopy = roomId; // Fallback
+            // Set a fallback in case the URL parsing fails (at least they get the code!)
+            let textToCopy = roomId; 
+            
             if (netflixUrlStr) {
                 try {
+                    // Turn the raw string into a programmable URL object
                     const url = new URL(netflixUrlStr);
+                    // Inject the secret '?wpRoom=x8kq2m1' parameter into the URL object
                     url.searchParams.set('wpRoom', roomId);
+                    // Convert it back to a standard string (https://www.netflix.com/watch/123?wpRoom=x8kq2m1)
                     textToCopy = url.toString();
-                } catch(e) {}
+                } catch(e) {
+                    // Defensive programming: If the URL was completely malformed, fail silently 
+                    // and just copy the fallback roomId.
+                }
             }
             
+            // --- CLIPBOARD LOGIC ---
+            // Trigger the browser's native clipboard API to copy the link.
             navigator.clipboard.writeText(textToCopy);
+            
+            // --- UX FEEDBACK ---
+            // Temporarily change the button text so the user knows the copy succeeded.
             this.roomBadge.innerText = 'Copied!';
+            // After 2 seconds, revert the button back to its normal state.
             setTimeout(() => { this.roomBadge.innerText = `Copy Code: ${roomId}`; }, 2000);
         };
     }
@@ -84,7 +103,7 @@ class SidebarUI {
 
         this.messagesList.appendChild(li);
 
-        // Auto-scroll to the bottom so you can see the newest message
+        // Auto-scroll to the bottom so the newest message is visible
         this.messagesList.scrollTop = this.messagesList.scrollHeight;
     }
 

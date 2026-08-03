@@ -7,40 +7,41 @@ import { socketAuthMiddleware } from './src/middleware/socketAuth.js';
 
 
 export function initSocket(server) {
-
-    // It hooks the socketio into the server and configured to allow cors requests
+    // Attach Socket.IO to the HTTP server and configure CORS
     const io = new Server(server, {
         cors: {
-            origin: "*", // Allow all origins including Chrome Extension
+            origin: "*", 
             methods: ["GET", "POST"],
         }
     });
 
+    // Enforce authentication on all incoming WebSocket connections
     io.use(socketAuthMiddleware);
 
+    // Handle new client connections
     io.on('connection', (socket) => {
-        console.log(`User is connected: ${socket.id}`);
+        console.log(`User connected: ${socket.id}`);
 
-        // Handle video-command from users
+        // Register event handlers
         videoHandler(socket);
-
-        // Handle room management
         roomHandler(socket);
-
-        // Handle chat messages
         chatHandler(socket);
 
-        // When the user gets disconnected
+        // Handle client disconnection
         socket.on('disconnect', () => {
-            console.log(`User disconnected: `, socket.id);
+            console.log(`User disconnected: ${socket.id}`);
+            
+            // Remove user from their active rooms
             const roomsRemovedFrom = roomStore.removeUserFromAllRooms(socket.id);
             
+            // Notify remaining users in those rooms
             roomsRemovedFrom.forEach(roomId => {
                 const room = roomStore.getRoom(roomId);
                 const newCount = room ? room.users.size : 0;
+                
                 socket.to(roomId).emit('room-update', { count: newCount });
 
-                // Send a system message that the user left
+                // Broadcast a system message indicating the user left
                 const leaveMessage = {
                     text: 'left the room',
                     senderId: socket.id,
@@ -51,6 +52,5 @@ export function initSocket(server) {
                 socket.to(roomId).emit('new-messages', leaveMessage);
             });
         });
-
-    })
+    });
 }

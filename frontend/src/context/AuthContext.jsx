@@ -9,7 +9,7 @@ export const AuthContext = createContext();
 // 2. The Provider component that wraps the app and manages state
 export const AuthProvider = ({children}) => {
     
-    // I hold the logged-in user's data globally so any component can read it
+    // Holds the logged-in user's data globally so any component can access it
     const [user, setUser] = useState(() => {
         const savedUser = localStorage.getItem('watchPartyUser');
         return savedUser ? JSON.parse(savedUser) : null;

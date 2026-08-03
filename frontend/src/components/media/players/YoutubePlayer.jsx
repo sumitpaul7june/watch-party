@@ -5,8 +5,8 @@ import "./YoutubePlayer.css";
 /**
  * YoutubePlayer Component
  * 
- * I use this component specifically to embed and synchronize YouTube videos.
- * It leverages the 'react-youtube' wrapper to interface with the official YouTube IFrame API.
+ * Specifically designed to embed and synchronize YouTube videos.
+ * Leverages the 'react-youtube' wrapper to interface with the official YouTube IFrame API.
  * The heavy lifting of synchronization logic is abstracted away into the 'useYoutubeSync' hook.
  * 
  * @param {object} socket - The active Socket.io connection.
@@ -14,7 +14,7 @@ import "./YoutubePlayer.css";
  * @param {object} mediaSource - Contains the parsed YouTube videoId.
  */
 const YoutubePlayer = ({ socket, roomId, mediaSource }) => {
-    // I extract the sync handlers from my custom hook
+    // Extracts the synchronization handlers from the custom hook
     const { onPlayerReady, handleStateChange } = useYoutubeSync(socket, roomId);
 
     const opts = {

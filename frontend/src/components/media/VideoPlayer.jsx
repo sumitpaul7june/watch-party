@@ -4,7 +4,7 @@ import DirectPlayer from "./players/DirectPlayer.jsx";
 /**
  * VideoPlayer Component
  * 
- * I designed this as a wrapper component that dynamically loads the correct 
+ * A wrapper component that dynamically loads the correct 
  * underlying video player based on the current media source type.
  * 
  * @param {object} socket - The active Socket.io connection.

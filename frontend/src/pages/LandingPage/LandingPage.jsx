@@ -20,7 +20,7 @@ const LandingPage = () =>
     }
 
     const handleCreateRoom = async () => {
-        // If the user isn't logged in, I auto-create a guest session first
+        // If the user isn't logged in, It auto-create a guest session first
         if (!user) {
             const guestResult = await loginAsGuest();
             if (!guestResult.success) {
@@ -71,8 +71,9 @@ const LandingPage = () =>
     const handleJoinRecentRoom = () => {
         if(lastRoomId) {
             setRoomId(lastRoomId);
-            // I can't directly call handleJoinRoom because it relies on the state which is async, 
-            // so I'll just navigate or call the logic directly. But since I need to check validity:
+            // Cannot reuse handleJoinRoom() directly here because it depends on the roomId state, 
+            // which updates asynchronously. Instead, perform the validation check using the local 
+            // lastRoomId variable directly to ensure the correct value is used:
             socket.emitWithAck('check-room', lastRoomId).then(response => {
                 if (response.status === 'invalid') {
                     alert('This room is no longer active!');
