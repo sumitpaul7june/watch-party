@@ -69,6 +69,7 @@ class SidebarManager {
 class VideoManager {
     constructor(onLocalVideoAction) {
         this.video = null;
+        this.observer = null; // Watches for new video elements (Netflix Next Episode)
         this.isShieldUp = false; // Prevents echo loops
         
         // Callback function used to pass video events (play/pause) UP to the ContentController.
@@ -88,7 +89,7 @@ class VideoManager {
         if (existing) this.hookVideo(existing);
 
         // Watch the DOM for new video elements (e.g. when clicking Next Episode)
-        const observer = new MutationObserver(() => {
+        this.observer = new MutationObserver(() => {
             if (this.video && document.contains(this.video)) return; // Already have it!
 
             const newVideo = document.querySelector('video');
@@ -98,7 +99,7 @@ class VideoManager {
             }
         });
 
-        observer.observe(document.body, { childList: true, subtree: true });
+        this.observer.observe(document.body, { childList: true, subtree: true });
     }
 
     /**
@@ -135,6 +136,11 @@ class VideoManager {
             this.video.removeEventListener('play', this._onPlay);
             this.video.removeEventListener('pause', this._onPause);
             this.video.removeEventListener('seeked', this._onSeek);
+        }
+        
+        if (this.observer) {
+            this.observer.disconnect();
+            this.observer = null;
         }
     }
 
