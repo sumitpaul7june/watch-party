@@ -6,12 +6,12 @@ import jwt from 'jsonwebtoken';
 // Handles new user signups by cryptographically hashing the password 
 // before persisting to PostgreSQL, and issues a 7-day JWT token on success.
 export const registerUser = async (req, res) => {
-    const { username, password } = req.body;
+    const { name, email, username, password } = req.body;
 
     // 1. Input Validation
     // Ensure the client provided the required payload
-    if (!username || !password) {
-        return res.status(400).json({ error: "Missing username or password" });
+    if (!username || !password || !email) {
+        return res.status(400).json({ error: "Missing required fields" });
     };
 
     try {
@@ -22,9 +22,9 @@ export const registerUser = async (req, res) => {
         const passwordHash = await bcrypt.hash(password, salt);
 
         // 3. Database Persistence
-        // Use parameterized queries ($1, $2) to prevent SQL injection attacks.
-        const SQL = `INSERT INTO users(username, password_hash) VALUES ($1, $2) RETURNING id, username, created_at`;
-        const result = await pool.query(SQL, [username, passwordHash]);
+        // Use parameterized queries ($1, $2, $3, $4) to prevent SQL injection attacks.
+        const SQL = `INSERT INTO users(name, email, username, password_hash) VALUES ($1, $2, $3, $4) RETURNING id, username, created_at`;
+        const result = await pool.query(SQL, [name, email, username, passwordHash]);
         const newUser = result.rows[0];
 
         // 4. Token Generation
