@@ -24,6 +24,7 @@ class SidebarManager {
         const iframe = document.createElement('iframe');
         iframe.src = chrome.runtime.getURL('sidebar/sidebar.html') + '?url=' + encodeURIComponent(window.location.href);
         iframe.id = this.iframeId;
+        iframe.allow = "clipboard-write";
         iframe.style.cssText = `
             position: fixed;
             top: 0;
